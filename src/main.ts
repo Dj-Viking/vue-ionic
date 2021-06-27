@@ -1,6 +1,9 @@
 import { createApp } from "vue"
 import App from "./App.vue"
 import router from "./router";
+import store from "./store";
+import BaseLayout from "./components/base/BaseLayout.vue";
+
 
 import { IonicVue } from "@ionic/vue";
 
@@ -24,11 +27,11 @@ import "@ionic/vue/css/display.css";
 import "./theme/variables.css";
 import "./theme/core.css";
 
-import BaseLayout from "./components/base/BaseLayout.vue";
 
 const app = createApp(App)
   .use(IonicVue)
-  .use(router);
+  .use(router)
+  .use(store);
 //creating a base layout wrapper component
 app.component('base-layout', BaseLayout);
   

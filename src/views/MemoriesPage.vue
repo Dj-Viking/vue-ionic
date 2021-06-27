@@ -7,7 +7,7 @@
             <ion-img :src="item.image" :alt="item.name"></ion-img>
           </ion-thumbnail>
           <ion-label>
-            {{item.name}}
+            {{i + 1}}. {{item.name}}
           </ion-label>
         </ion-item>
       </div>
@@ -17,7 +17,8 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import { ListItemAttributes, ListItem, ListItemClass } from "../types";
+import { Memory, ListItemClass } from "../types";
+import { mapGetters } from "vuex";
 import { 
   IonList, 
   IonItem,
@@ -36,57 +37,31 @@ export default defineComponent({
   },
   data() {
     return {
-      images: ((): Array<string> => [""])(),
-      memories: ((): Array<string> => [""])(),
-      list: (function(): Array<ListItem> {
+      //initializing to an array of memories so I am succinct about what type of thing I am exposing to the vue template
+      list: (function(): Array<Memory> {
         return new Array(3).fill(undefined).map((_: any, index: number) => {
-          const attributes: ListItemAttributes = {
+          const memory: Memory = {
             id: index + 1,
             image: "askdjfkdsjfkd",
+            description: "aldkjfskdjfjkdfdk",
             name: `${index + 1}. this is all replaced later on init`,
             route: `/memories/${index + 1}`
           }
-          return new ListItemClass(attributes)
+          return new ListItemClass(memory)
         });
       })()
     }
   },
+  computed: {
+    ...mapGetters(["memories"])
+  },
   methods: {
-    initMemories(): void {
-      this.memories = [
-        "Sunset",
-        "Eclipse",
-        "Mountains"
-      ]
-    },
-    initImages(): void {
-      //have to set the image paths relative to where the app
-      // itself is mounting which is in the public folder
-      // and the app mounts on the index.html page
-      this.images = [
-        './assets/images/sunset.jpg',
-        './assets/images/eclipse.jpg',
-        './assets/images/mountains.jpg',
-      ]
-    },
-    initList(memories: Array<string>, images: Array<string>): void {
-      this.list = new Array(3).fill(undefined).map((_: any, index: number) => {
-        const attributes: ListItemAttributes = {
-          id: index + 1,
-          image: `${images[index]}`,
-          name: `${index + 1}. ${memories[index]}`,
-          route: `/memories/${index + 1}`
-        }
-        return new ListItemClass(attributes);
-      });
+    initList(memories: Array<Memory>): void {
+      this.list = memories.map((m: Memory) => new ListItemClass(m))
     }
   },
-  created() {
-    this.initMemories();
-    this.initImages();
-    this.initList(this.memories, this.images);
-    console.log('checking list', this.list);
-    
+  created(): void {
+    this.initList(this.memories);
   },
 });
 </script>
@@ -95,4 +70,7 @@ export default defineComponent({
   /* ion-title {
     background-color: rgb(52, 228, 255);
   } */
+  ion-item {
+    cursor: pointer;
+  }
 </style>

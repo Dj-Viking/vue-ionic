@@ -1,24 +1,23 @@
-export type ListItem = ListItemClass;
 /**
  * image will be a URL link to get load an image
  */
-export interface ListItemAttributes {
-  name: string;
+export interface Memory {
   id: number;
+  name: string;
   image: string;
+  description: string;
   route: string;
 }
-export class ListItemClass extends Object {
-  name!: string;
+export class ListItemClass extends Object implements Memory { 
   id!: number;
+  name!: string;
+  description!: string;
   image!: string;
   route!: string;
-  constructor(attributes: ListItemAttributes) {
+  constructor(memory: Memory) {
     super();
-    const { name, id, route, image } = attributes;
-    this.name = name;
-    this.id = id;
-    this.image = image;
-    this.route = route;
+    Object.assign(this, {
+      ...memory
+    });
   }
 }
