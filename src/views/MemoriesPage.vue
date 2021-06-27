@@ -33,6 +33,7 @@ export default defineComponent({
         return new Array(3).fill(undefined).map((_: any, index: number) => {
           const attributes: ListItemAttributes = {
             id: index + 1,
+            image: "askdjfkdsjfkd",
             name: `${index + 1}. this is all replaced later on init`,
             route: `/memories/${index + 1}`
           }
@@ -53,6 +54,7 @@ export default defineComponent({
       this.list = new Array(3).fill(undefined).map((_: any, index: number) => {
         const attributes: ListItemAttributes = {
           id: index + 1,
+          image: "a;lsdkjfkdjfkd",
           name: `${index + 1}. ${memories[index]}`,
           route: `/memories/${index + 1}`
         }

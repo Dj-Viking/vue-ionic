@@ -13,9 +13,7 @@
         </ion-toolbar>
       </ion-header>
       <ion-content>
-        <ion-list>
-          <slot />
-        </ion-list>
+        <slot />
       </ion-content>
   </ion-page>
 </template>
@@ -23,7 +21,6 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { 
-  IonList, 
   IonPage, 
   IonHeader, 
   IonTitle, 
@@ -39,7 +36,6 @@ export default defineComponent({
     pageDefaultBackLink: String
   },
   components: {
-    IonList,
     IonPage,
     IonHeader,
     IonTitle, 
