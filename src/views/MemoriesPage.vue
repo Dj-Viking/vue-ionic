@@ -1,35 +1,21 @@
 <template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>
-          {{ pageTitle }}
-        </ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <ion-list>
-        <div v-for="(item, i) in list" :key="i">
-          <ion-item>
-            {{item.name}}
-          </ion-item>
-        </div>
-      </ion-list>
-    </ion-content>
-  </ion-page>
+  <base-layout page-title="here is a title">
+    <ion-list>
+      <div v-for="(item, i) in list" :key="i">
+        <ion-item :router-link="item.route">
+          {{item.name}}
+        </ion-item>
+      </div>
+    </ion-list>
+  </base-layout>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import { ListItem, ListItemClass } from "../types";
+import { ListItemAttributes, ListItem, ListItemClass } from "../types";
 import { 
   IonList, 
   IonItem, 
-  IonPage, 
-  IonHeader, 
-  IonTitle, 
-  IonContent, 
-  IonToolbar 
 } from "@ionic/vue";
 
 export default defineComponent({
@@ -39,17 +25,17 @@ export default defineComponent({
   components: {
     IonItem,
     IonList,
-    IonPage,
-    IonHeader,
-    IonTitle, 
-    IonContent,
-    IonToolbar 
   },
   data() {
     return {
       list: (function(): Array<ListItem> {
         return new Array(5).fill(undefined).map((_: any, index: number) => {
-          return new ListItemClass(`${index + 1}. Item ${index + 1}`)
+          const attributes: ListItemAttributes = {
+            id: index + 1,
+            name: `${index + 1}. Item ${index + 1}`,
+            route: `/memories/${index + 1}`
+          }
+          return new ListItemClass(attributes)
         });
       })()
     }
@@ -61,7 +47,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-  ion-title {
+  /* ion-title {
     background-color: rgb(52, 228, 255);
-  }
+  } */
 </style>
