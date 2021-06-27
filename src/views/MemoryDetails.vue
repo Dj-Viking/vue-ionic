@@ -1,5 +1,5 @@
 <template>
-  <base-layout pageTitle="Memory Details">
+  <base-layout pageDefaultBackLink="/" pageTitle="Memory Details">
   details page
   </base-layout>
 </template>

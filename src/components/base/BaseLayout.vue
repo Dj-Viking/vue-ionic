@@ -4,7 +4,7 @@
         <ion-toolbar>
           <ion-buttons slot="start">
             <ion-back-button
-              defaultHref="/"
+              :defaultHref="pageDefaultBackLink"
             ></ion-back-button>
           </ion-buttons>
           <ion-title>
@@ -35,7 +35,8 @@ import {
 
 export default defineComponent({
   props: {
-    pageTitle: String
+    pageTitle: String,
+    pageDefaultBackLink: String
   },
   components: {
     IonList,
