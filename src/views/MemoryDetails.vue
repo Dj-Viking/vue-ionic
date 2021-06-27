@@ -25,9 +25,7 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapActions([
-      "getOneMemory"
-    ])
+    ...mapActions(["getOneMemory"])
   },
   async created(): Promise<void> {
     //making eslint happy with this strict typing of the id prop
