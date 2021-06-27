@@ -49,7 +49,7 @@ export default defineComponent({
         "Mountians"
       ]
     },
-    initList(memories: Array<string>) {
+    initList(memories: Array<string>): void {
       this.list = new Array(3).fill(undefined).map((_: any, index: number) => {
         const attributes: ListItemAttributes = {
           id: index + 1,
