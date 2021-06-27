@@ -19,9 +19,6 @@ import {
 } from "@ionic/vue";
 
 export default defineComponent({
-  props: {
-    pageTitle: String
-  },
   components: {
     IonItem,
     IonList,
