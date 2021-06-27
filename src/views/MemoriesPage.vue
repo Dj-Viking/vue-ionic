@@ -28,7 +28,7 @@ export default defineComponent({
   },
   data() {
     return {
-      memories: (() => [""])(),
+      memories: ((): Array<string> => [""])(),
       list: (function(): Array<ListItem> {
         return new Array(3).fill(undefined).map((_: any, index: number) => {
           const attributes: ListItemAttributes = {
