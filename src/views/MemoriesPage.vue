@@ -1,5 +1,5 @@
 <template>
-  <base-layout page-title="here is a title">
+  <base-layout page-title="Memories">
     <ion-list>
       <div v-for="(item, i) in list" :key="i">
         <ion-item :router-link="item.route">
@@ -28,11 +28,12 @@ export default defineComponent({
   },
   data() {
     return {
+      memories: (() => [""])(),
       list: (function(): Array<ListItem> {
-        return new Array(5).fill(undefined).map((_: any, index: number) => {
+        return new Array(3).fill(undefined).map((_: any, index: number) => {
           const attributes: ListItemAttributes = {
             id: index + 1,
-            name: `${index + 1}. Item ${index + 1}`,
+            name: `${index + 1}. this is all replaced later on init`,
             route: `/memories/${index + 1}`
           }
           return new ListItemClass(attributes)
@@ -40,8 +41,28 @@ export default defineComponent({
       })()
     }
   },
+  methods: {
+    initMemories(): void {
+      this.memories = [
+        "Sunset",
+        "Eclipse",
+        "Mountians"
+      ]
+    },
+    initList(memories: Array<string>) {
+      this.list = new Array(3).fill(undefined).map((_: any, index: number) => {
+        const attributes: ListItemAttributes = {
+          id: index + 1,
+          name: `${index + 1}. ${memories[index]}`,
+          route: `/memories/${index + 1}`
+        }
+        return new ListItemClass(attributes);
+      });
+    }
+  },
   created() {
-    console.log('checking list on mounted', this.list);
+    this.initMemories();
+    this.initList(this.memories);
   },
 });
 </script>
