@@ -1,5 +1,10 @@
 <template>
-  <base-layout pageDefaultBackLink="/" pageTitle="Memory Details">
+  <base-layout 
+    pageDefaultBackLink="/" 
+    :pageTitle="
+      memory && memory.name ? memory.name : 'Not Found'
+    "
+  >
     <h2 v-if="!memory">
       Could not find that stored memory
     </h2>
