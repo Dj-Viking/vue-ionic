@@ -1,17 +1,22 @@
 <template>
     <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>
-          {{ pageTitle }}
-        </ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <ion-list>
-        <slot />
-      </ion-list>
-    </ion-content>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-back-button
+              defaultHref="/"
+            ></ion-back-button>
+          </ion-buttons>
+          <ion-title>
+            {{ pageTitle }}
+          </ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-list>
+          <slot />
+        </ion-list>
+      </ion-content>
   </ion-page>
 </template>
 
@@ -23,7 +28,9 @@ import {
   IonHeader, 
   IonTitle, 
   IonContent, 
-  IonToolbar 
+  IonToolbar,
+  IonBackButton,
+  IonButtons
 } from "@ionic/vue";
 
 export default defineComponent({
@@ -36,7 +43,9 @@ export default defineComponent({
     IonHeader,
     IonTitle, 
     IonContent,
-    IonToolbar 
+    IonToolbar,
+    IonBackButton,
+    IonButtons
   },
 })
 </script>
