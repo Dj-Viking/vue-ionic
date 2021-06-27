@@ -3,7 +3,12 @@
     <ion-list>
       <div v-for="(item, i) in list" :key="i">
         <ion-item :router-link="item.route">
-          {{item.name}}
+          <ion-thumbnail slot="start">
+            <ion-img :src="item.image" :alt="item.name"></ion-img>
+          </ion-thumbnail>
+          <ion-label>
+            {{item.name}}
+          </ion-label>
         </ion-item>
       </div>
     </ion-list>
@@ -15,16 +20,23 @@ import { defineComponent } from "@vue/runtime-core";
 import { ListItemAttributes, ListItem, ListItemClass } from "../types";
 import { 
   IonList, 
-  IonItem, 
+  IonItem,
+  IonImg,
+  IonThumbnail,
+  IonLabel
 } from "@ionic/vue";
 
 export default defineComponent({
   components: {
     IonItem,
     IonList,
+    IonImg,
+    IonThumbnail,
+    IonLabel
   },
   data() {
     return {
+      images: ((): Array<string> => [""])(),
       memories: ((): Array<string> => [""])(),
       list: (function(): Array<ListItem> {
         return new Array(3).fill(undefined).map((_: any, index: number) => {
@@ -44,14 +56,24 @@ export default defineComponent({
       this.memories = [
         "Sunset",
         "Eclipse",
-        "Mountians"
+        "Mountains"
       ]
     },
-    initList(memories: Array<string>): void {
+    initImages(): void {
+      //have to set the image paths relative to where the app
+      // itself is mounting which is in the public folder
+      // and the app mounts on the index.html page
+      this.images = [
+        './assets/images/sunset.jpg',
+        './assets/images/eclipse.jpg',
+        './assets/images/mountains.jpg',
+      ]
+    },
+    initList(memories: Array<string>, images: Array<string>): void {
       this.list = new Array(3).fill(undefined).map((_: any, index: number) => {
         const attributes: ListItemAttributes = {
           id: index + 1,
-          image: "a;lsdkjfkdjfkd",
+          image: `${images[index]}`,
           name: `${index + 1}. ${memories[index]}`,
           route: `/memories/${index + 1}`
         }
@@ -61,7 +83,10 @@ export default defineComponent({
   },
   created() {
     this.initMemories();
-    this.initList(this.memories);
+    this.initImages();
+    this.initList(this.memories, this.images);
+    console.log('checking list', this.list);
+    
   },
 });
 </script>
