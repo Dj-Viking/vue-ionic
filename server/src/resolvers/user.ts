@@ -14,6 +14,7 @@ import { getConnection } from 'typeorm';
 import argon2 from 'argon2';
 import { COOKIE_NAME, FORGET_PASS_PREFIX } from '../constants';
 import { sendEmail } from '../utils/sendEmail';
+import { ErrorResponse } from 'src/utils/createError';
 const uuid = require('uuid');
 
 @InputType()
@@ -262,36 +263,21 @@ export class UserResolver {
     {
       if (emailRegex.test(options.email) === false) 
       {
-        return {
-          errors: [
-            {
-              field: "Email",
-              message: "Email is not in correct format. Must be like example@mail.com"
-            }
-          ]
-        }
+        const field = "Email";
+        const message = "Email is not in correct format. Must be like example@mail.com";
+        return new ErrorResponse(field, message);
       }
       if (options.username.length <= 2) 
       {
-        return {
-          errors: [
-            {
-              field: "Username",
-              message: "username length too short must be greater than 2 characters"
-            },
-          ],
-        };
+        const field =  "Username";
+        const message = "username length too short must be greater than 2 characters";
+        return new ErrorResponse(field, message);
       }
       if (options.password.length <= 3) 
       {
-        return {
-          errors: [
-            {
-              field: "Password",
-              message: "password length too short must be greater than 3 characters"
-            },
-          ],
-        };
+        const field = "Password";
+        const message = "password length too short must be greater than 3 characters";
+        return new ErrorResponse(field, message);
       }
   
       const hashedPassword = await argon2.hash(options.password);
@@ -320,23 +306,13 @@ export class UserResolver {
     } catch (error) {
       if (error.code === '23505' || error.detail.includes('already exists'))
       {
-        return {
-          errors: [
-            {
-              field: 'Username',
-              message: "That username already exists!"
-            },
-          ],
-        };
+        const field = 'Username';
+        const message = "That username already exists!";
+        return new ErrorResponse(field, message);
       } else {
-        return {
-          errors: [
-            {
-              field: 'Error',
-              message: error
-            }
-          ],
-        };
+        const field = 'Error';
+        const message = error;
+        return new ErrorResponse(field, message);
       }
     }
   }

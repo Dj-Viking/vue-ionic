@@ -1,3 +1,4 @@
+import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -124,3 +125,28 @@ export type MeQuery = (
     & UserInfoFragment
   )> }
 );
+export const UserInfoFragmentDoc = gql`
+    fragment userInfo on User {
+  id
+  username
+  email
+  createdAt
+  updatedAt
+}
+    `;
+export const LoginDocument = gql`
+    mutation login($options: LoginInput!) {
+  login(options: $options) {
+    errors {
+      field
+      message
+    }
+    user {
+      ...userInfo
+    }
+  }
+}
+    ${UserInfoFragmentDoc}`;
+
+
+    
