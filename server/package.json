@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsw": "tsc -w",
+    "tsc": "tsc",
     "dev": "nodemon dist/index.js"
   },
   "keywords": [],
