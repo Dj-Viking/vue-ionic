@@ -1,0 +1,28 @@
+{
+  "name": "first-vue-ionic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
+    "start:prod": "cd server; npm start",
+    "start:dev": "concurrently \"cd server && npm run tsw\" \"cd client && npm run serve\"",
+    "install": "cd server && npm i && cd ../client && npm i",
+    "heroku-postbuild": "cd client && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dj-Viking/vue-ionic.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dj-Viking/vue-ionic/issues"
+  },
+  "homepage": "https://github.com/Dj-Viking/vue-ionic#readme",
+  "dependencies": {
+    "concurrently": "^6.2.0",
+    "if-env": "^1.0.4"
+  }
+}
