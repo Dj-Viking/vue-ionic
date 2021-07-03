@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Dj-Viking/vue-ionic#readme",
   "dependencies": {
+    "@babel/preset-typescript": "^7.14.5",
     "concurrently": "^6.2.0",
     "if-env": "^1.0.4"
   }
