@@ -6,7 +6,7 @@ import express from "express";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
-import cors from "cors";
+// import cors from "cors";
 import { COOKIE_NAME, IS_PROD } from "./constants";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
@@ -21,7 +21,7 @@ const {
   SECRET,
 } = process.env;
 
-const App = async (): Promise<void> => {
+export const startServer = async (): Promise<void> => {
   console.log("hello world!!!!");
   //start db connection
   await createConnection({
@@ -40,12 +40,12 @@ const App = async (): Promise<void> => {
   const RedisStore = connectRedis(session);
   const RedisClient = new Redis();
 
-  app.use(
-    cors({
-      origin: "http://localhost:8080",
-      credentials: true
-    })
-  );
+  // app.use(
+  //   cors({
+  //     origin: "http://localhost:8080",
+  //     credentials: true
+  //   })
+  // );
 
   //redis middleware for auth tokens
   app.use(
@@ -98,8 +98,7 @@ const App = async (): Promise<void> => {
 
 
 }
-export default App;
-App().catch((e: Error) => console.log(
+startServer().catch((e: Error) => console.log(
                                       ANSI_ESCAPES.red, 
                                       `error while server started` + e.name + ' ' + e.stack, 
                                       ANSI_ESCAPES.reset));

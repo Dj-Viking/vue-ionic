@@ -208,6 +208,8 @@ export class UserResolver {
   async me(
     @Ctx() { req }: MyContext
   ): Promise<User | undefined>{
+    console.log(req);
+    
     // you are not logged in
     if (!req.session.userId) return undefined;
 
@@ -220,6 +222,7 @@ export class UserResolver {
     mutation 
     {
         register(options: {
+          email: "viking@viking.com"
           username: "viking",
           password: "viking"
         })
@@ -229,6 +232,7 @@ export class UserResolver {
             message
           }
           user{
+            email
             username
             id
             createdAt
@@ -258,6 +262,7 @@ export class UserResolver {
     @Arg('options', () => RegisterInput) options: RegisterInput,
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     try 
     {

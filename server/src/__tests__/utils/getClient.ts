@@ -1,5 +1,6 @@
 import ApolloClient from "apollo-boost";
 import { ANSI_ESCAPES } from "src/types";
+import "reflect-metadata";
 
 export const getClient = (token: string) => {
   return new ApolloClient({
@@ -10,7 +11,7 @@ export const getClient = (token: string) => {
           headers: {
             "Authorization": `Bearer ${token}`
           }
-        })
+        });
       }
     },
     onError: (e) => console.log(
