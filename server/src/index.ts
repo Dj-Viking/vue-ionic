@@ -21,7 +21,7 @@ const {
   SECRET,
 } = process.env;
 
-(async function Main(){
+const App = async (): Promise<void> => {
   console.log("hello world!!!!");
   //start db connection
   await createConnection({
@@ -94,11 +94,12 @@ const {
       `server started on localhost:${PORT}`,
       ANSI_ESCAPES.reset
     );
-    
-  })
+  });
 
 
-})().catch((e: Error) => console.log(
+}
+export default App;
+App().catch((e: Error) => console.log(
                                       ANSI_ESCAPES.red, 
                                       `error while server started` + e.name + ' ' + e.stack, 
                                       ANSI_ESCAPES.reset));
