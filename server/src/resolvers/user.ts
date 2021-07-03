@@ -14,7 +14,7 @@ import { getConnection } from 'typeorm';
 import argon2 from 'argon2';
 import { COOKIE_NAME, FORGET_PASS_PREFIX } from '../constants';
 import { sendEmail } from '../utils/sendEmail';
-import { ErrorResponse } from 'src/utils/createError';
+import { ErrorResponse } from '../utils/createError';
 const uuid = require('uuid');
 
 @InputType()
