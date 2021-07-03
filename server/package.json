@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test:config": "jest --showConfig",
     "test": "jest --verbose",
     "tsw": "tsc -w",
     "tsc": "tsc",
