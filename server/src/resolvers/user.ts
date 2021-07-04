@@ -337,14 +337,9 @@ export class UserResolver {
     const user = await User.findOne({ where: { email: options.email } });
     if (!user) 
     {
-      return {
-        errors: [
-          {
-            field: 'Credentials',
-            message: 'Incorrect Credentials'
-          },
-        ],
-      };
+      const field = 'Credentials';
+      const message = 'Incorrect Credentials';
+      return new ErrorResponse(field, message);
     }
     const valid = await argon2.verify(user.password, options.password);
     if (!valid)
