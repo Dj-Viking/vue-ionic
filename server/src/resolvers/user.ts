@@ -82,14 +82,9 @@ export class UserResolver {
       if (!user) {
         //email not in db
         // dont send the email
-        return {
-          errors: [
-            {
-              field: "Credentials",
-              message: "There was a problem with this request. Please try again later"
-            }
-          ]
-        };
+        const field = "Credentials";
+        const message = "There was a problem with this request. Please try again later";
+        return new ErrorResponse(field, message);
       }
       //if we actually matched a user 
       // the mutation will take some time
@@ -114,14 +109,9 @@ export class UserResolver {
       }
     } catch (error) {
       console.log(error);
-      return {
-        errors: [
-          {
-            field: "Credentials",
-            message: "There was a problem with this request. Please try again later"
-          }
-        ]
-      };
+      const field = "Credentials";
+      const message = "There was a problem with this request. Please try again later";
+      return new ErrorResponse(field, message);
     }
   }
 
@@ -135,14 +125,9 @@ export class UserResolver {
     try {
       if (newPassword.length <= 3) 
       {
-        return {
-          errors: [
-            {
-              field: "newPassword",
-              message: "New password length too short must be greater than 3 characters"
-            },
-          ],
-        };
+        const field = "newPassword";
+        const message = "New password length too short must be greater than 3 characters";
+        return new ErrorResponse(field, message);
       }
   
       const key = FORGET_PASS_PREFIX + token;
@@ -150,28 +135,18 @@ export class UserResolver {
       console.log('user ID returned from REDIS CLIENT!!!', Promise.resolve(userId));
       if (!userId) 
       {
-        return {
-          errors: [
-            {
-              field: "token",
-              message: "token expired"
-            },
-          ],
-        };
+        const field = "token";
+        const message = "token expired";
+        return new ErrorResponse(field, message);
       }
   
       const userIdFound = parseInt(userId);
       const user = await User.findOne(userIdFound);
       if (!user) 
       {
-        return {
-          errors: [
-            {
-              field: "token",
-              message: "token expired"
-            },
-          ],
-        };
+        const field =  "token";
+        const message =  "token expired";
+        return new ErrorResponse(field, message);
       }
 
       const hashedPassword = await argon2.hash(newPassword);
@@ -193,14 +168,9 @@ export class UserResolver {
       }
     } catch (error) {
       console.log(error);
-      return {
-        errors: [
-          {
-            field: "error",
-            message: error
-          },
-        ],
-      };
+      const field =  "error";
+      const message =  error;
+      return new ErrorResponse(field, message);
     }
   }
 
@@ -379,14 +349,9 @@ export class UserResolver {
     const valid = await argon2.verify(user.password, options.password);
     if (!valid)
     {
-      return {
-        errors: [
-          {
-            field: "Credentials",
-            message: "Incorrect Credentials"
-          },
-        ],
-      };
+      const field = "Credentials";
+      const message = "Incorrect Credentials";
+      return new ErrorResponse(field, message);
     }
     //login the user, and set the cookie
     req.session.userId = user.id;
