@@ -33,4 +33,12 @@ export type MyContext = {
     yellow = "\x1b[33m",
     purple = "\x1b[35m",
     reset = "\x1b[00m"
- }
+}
+
+export interface RegisterResponse {
+    register: {
+        user: {
+            email: string
+        }
+    }
+}
