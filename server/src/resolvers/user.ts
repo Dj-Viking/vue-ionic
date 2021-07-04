@@ -309,7 +309,7 @@ export class UserResolver {
         user
       };
     } catch (error) {
-      if (error.code === '23505' || error.detail.includes('already exists'))
+      if (error.code === '23505' || error.detail && error.detail.includes('already exists'))
       {
         const field = 'Username';
         const message = "That username already exists!";
