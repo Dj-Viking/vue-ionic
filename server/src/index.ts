@@ -29,7 +29,7 @@ export const startServer = async (): Promise<void> => {
     database: DB_NAME as string,
     username: DB_USER as string,
     password: DB_PASSWORD as string,
-    logging: true,
+    logging: !IS_PROD, //dont log if we are in prod
     synchronize: true, //usually true during dev
     entities: [User]
   });
