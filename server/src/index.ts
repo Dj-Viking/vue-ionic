@@ -6,7 +6,7 @@ import express from "express";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
-// import cors from "cors";
+import cors from "cors";
 import { COOKIE_NAME, IS_PROD } from "./constants";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
@@ -19,6 +19,7 @@ const {
   DB_TYPE,
   DB_PASSWORD,
   SECRET,
+  CORS_ALLOWED
 } = process.env;
 
 export const startServer = async (): Promise<void> => {
@@ -40,12 +41,12 @@ export const startServer = async (): Promise<void> => {
   const RedisStore = connectRedis(session);
   const RedisClient = new Redis();
 
-  // app.use(
-  //   cors({
-  //     origin: "http://localhost:8080",
-  //     credentials: true
-  //   })
-  // );
+  app.use(
+    cors({
+      origin: CORS_ALLOWED,
+      credentials: true
+    })
+  );
 
   //redis middleware for auth tokens
   app.use(
