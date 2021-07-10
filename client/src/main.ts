@@ -1,18 +1,11 @@
-import { createApp, provide } from "vue"
+import { createApp } from "vue"
 import App from "./App.vue"
-import { DefaultApolloClient } from "@vue/apollo-composable"
-import ApolloClient from "apollo-boost";
 import router from "./router";
 import store from "./store";
 import BaseLayout from "./components/base/BaseLayout.vue";
+
+
 import { IonicVue } from "@ionic/vue";
-
-//create apollo client
-const apolloClient = new ApolloClient({
-  // You should use an absolute URL here
-  uri: 'localhost:4000/graphql'
-});
-
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/vue/css/core.css";
@@ -35,15 +28,10 @@ import "./theme/variables.css";
 import "./theme/core.css";
 
 
-const app = createApp({
-  setup(){
-    provide(DefaultApolloClient, apolloClient)
-  },
-  render: (h: any) => h(App)
-})
-.use(IonicVue)
-.use(router)
-.use(store);
+const app = createApp(App)
+  .use(IonicVue)
+  .use(router)
+  .use(store);
 //creating a base layout wrapper component
 app.component('base-layout', BaseLayout);
   
