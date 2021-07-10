@@ -39,11 +39,11 @@ describe("Tests the user register", () => {
   });
 
   it("checks if we delete the user we just made", async () => {
-    console.log(`${ANSI_ESCAPES.blue}`, `deleting a user`, `${ANSI_ESCAPES.reset}`);
     
     const connection = await connectDb();
     await User.delete({ email: REGISTER_EMAIL });
     const users = await User.find({ where: { email: REGISTER_EMAIL } });
+    console.log(`${ANSI_ESCAPES.blue}`, `deleting a user ${users}`, `${ANSI_ESCAPES.reset}`);
     logJson(users);
     expect(users).toHaveLength(0);
     connection.close();
