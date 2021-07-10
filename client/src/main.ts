@@ -1,11 +1,10 @@
-import { createApp } from "vue"
+import { createApp, h, provide } from "vue"
 import App from "./App.vue"
 import router from "./router";
 import store from "./store";
 import BaseLayout from "./components/base/BaseLayout.vue";
-
-
 import { IonicVue } from "@ionic/vue";
+
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/vue/css/core.css";
@@ -27,8 +26,30 @@ import "@ionic/vue/css/display.css";
 import "./theme/variables.css";
 import "./theme/core.css";
 
+//apollo stuff
+import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core';
+import { DefaultApolloClient } from "@vue/apollo-composable";
 
-const app = createApp(App)
+// Cache implementation
+const cache = new InMemoryCache()
+// HTTP connection to the API
+const httpLink = createHttpLink({
+  // You should use an absolute URL here
+  uri: 'http://localhost:4000/graphql',
+});
+
+// Create the apollo client
+const apolloClient = new ApolloClient({
+  link: httpLink,
+  cache,
+  credentials: 'include',
+});
+const app = createApp({
+  setup() {
+    provide(DefaultApolloClient, apolloClient)
+  },
+  render: () => h(App)
+})
   .use(IonicVue)
   .use(router)
   .use(store);

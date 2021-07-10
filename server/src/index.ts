@@ -43,7 +43,7 @@ export const startServer = async (): Promise<void> => {
 
   app.use(
     cors({
-      origin: CORS_ALLOWED,
+      origin: new RegExp(CORS_ALLOWED as string),
       credentials: true
     })
   );

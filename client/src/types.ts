@@ -16,3 +16,17 @@ export class ListItemClass implements Memory {
     });
   }
 }
+
+export interface RegisterResponse {
+  register: {
+      errors: null 
+      | [{
+        field: string;
+        message: string;
+      }];
+      user: null 
+      | {
+          email: string;
+      };
+  };
+}
