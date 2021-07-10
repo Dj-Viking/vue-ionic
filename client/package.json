@@ -1,5 +1,6 @@
 {
   "name": "first-vue-ionic",
+  "proxy": "http://localhost:8100",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -17,8 +18,12 @@
     "@capacitor/status-bar": "1.0.2",
     "@ionic/vue": "^5.4.0",
     "@ionic/vue-router": "^5.4.0",
+    "@vue/apollo-composable": "^4.0.0-alpha.13",
+    "apollo-boost": "^0.4.9",
     "core-js": "^3.6.5",
+    "graphql": "^15.5.1",
     "vue": "^3.0.0-0",
+    "vue-apollo": "^3.0.7",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.2"
   },
