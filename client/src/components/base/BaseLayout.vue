@@ -15,6 +15,13 @@
             >
               {{ !isHome ? "Home" : "Login" }}
             </ion-button>
+            <ion-button
+              :href="
+                isHome ? '/signup' : '/'
+              "
+            >
+              {{ !isHome ? null : "Signup" }}
+            </ion-button>
           </ion-buttons>
           <ion-title>
             {{ pageTitle }}
