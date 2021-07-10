@@ -4,6 +4,7 @@
     :pageTitle="
       memory && memory.name ? memory.name : 'Not Found'
     "
+    :isHome="false"
   >
     <h2 v-if="!memory">
       Could not find that stored memory

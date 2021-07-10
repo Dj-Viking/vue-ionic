@@ -1,5 +1,5 @@
 <template>
-  <base-layout page-title="Memories">
+  <base-layout page-title="Memories" :isHome="true">
     <ion-list>
       <div v-for="(item, i) in list" :key="i">
         <ion-item :router-link="item.route">

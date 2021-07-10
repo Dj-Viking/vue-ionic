@@ -7,6 +7,15 @@
               :defaultHref="pageDefaultBackLink"
             ></ion-back-button>
           </ion-buttons>
+          <ion-buttons slot="end">
+            <ion-button
+              :href="
+                isHome ? '/login' : '/'
+              "
+            >
+              {{ !isHome ? "Home" : "Login" }}
+            </ion-button>
+          </ion-buttons>
           <ion-title>
             {{ pageTitle }}
           </ion-title>
@@ -19,6 +28,7 @@
 </template>
 
 <script lang="ts">
+//get like a global auth class to check if the page we are looking at while authenticated on should have a different look
 import { defineComponent } from "@vue/runtime-core";
 import { 
   IonPage, 
@@ -27,13 +37,16 @@ import {
   IonContent, 
   IonToolbar,
   IonBackButton,
-  IonButtons
+  IonButtons,
+  IonButton
 } from "@ionic/vue";
 
 export default defineComponent({
   props: {
     pageTitle: String,
-    pageDefaultBackLink: String
+    pageDefaultBackLink: String,
+    isHome: Boolean,
+    navButtonText: String
   },
   components: {
     IonPage,
@@ -42,7 +55,8 @@ export default defineComponent({
     IonContent,
     IonToolbar,
     IonBackButton,
-    IonButtons
+    IonButtons,
+    IonButton
   },
 })
 </script>
