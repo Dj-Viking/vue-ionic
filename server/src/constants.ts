@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { RegisterResponse } from "./types";
+import { LoginResponse, LogoutResponse, MeResponse, RegisterErrorResponse, RegisterResponse } from "./types";
 
 const {
   TEST_EMAIL,
@@ -15,6 +15,36 @@ export const HOST: string | undefined = TEST_HOST;
 export const REGISTER_EMAIL: string | undefined = TEST_EMAIL
 export const REGISTER_USERNAME: string | undefined = TEST_USER
 export const REGISTER_PASSWORD: string | undefined = TEST_PASS
+
+/**
+ * query to check that when i log in that i can get my information from the db while logged in
+ */
+export const ME_QUERY: string = `
+  query me {
+    me {
+      email
+    }
+  }
+`;
+
+/**
+ * expect logout response to be true if it worked
+ */
+export const CORRECT_LOGOUT_RESPONSE: LogoutResponse = {
+  logout: true
+};
+/**
+ * expect to get whatever user data we want from the query for now just email on this constant
+ */
+export const CORRECT_ME_RESPONSE: MeResponse = {
+  "me": {
+    "email": `${REGISTER_EMAIL}`
+  }
+};
+
+/**
+ * string literal of the graphql mutation for the register action
+ */
 export const REGISTER_MUTATION: string = `
 mutation register {
   register(options: {
@@ -22,16 +52,70 @@ mutation register {
     password: "${REGISTER_PASSWORD}",
     username: "${REGISTER_USERNAME}"
   }){
+    errors {
+      field
+      message
+    }
     user{
       email
     }
   }
 }
 `;
-export const CORRECT_REGISTER_RESPONSE: RegisterResponse = {
-  "register": {
+/**
+ * string literal of the graphql mutation for the login action
+ */
+export const LOGOUT_MUTATION: string = `
+mutation logout {
+  logout
+}`;
+/**
+ * string literal of the graphql mutation for the login action
+ */
+export const LOGIN_MUTATION: string = `
+mutation login {
+  login(options: {
+    email: "${REGISTER_EMAIL}",
+    password: "${REGISTER_PASSWORD}",
+  }){
+    user{
+      email
+    }
+  }
+}`;
+
+/**
+ * the response we should be getting from the graphql translation layer to the postgresql db
+ */
+export const CORRECT_LOGIN_RESPONSE: LoginResponse = {
+  "login": {
     "user": {
       "email": `${REGISTER_EMAIL}`,
     },
+  }
+};
+/**
+ * the response we should be getting from the graphql translation layer to the postgresql db
+ */
+export const CORRECT_REGISTER_RESPONSE: RegisterResponse = {
+  "register": {
+    "errors": null,
+    "user": {
+      "email": `${REGISTER_EMAIL}`,
+    },
+  }
+};
+/**
+ * the response we should be getting from the graphql translation layer to the postgresql db
+ */
+export const CORRECT_REGISTER_ERROR: RegisterErrorResponse = {
+  "register": {
+    "errors": [
+      {
+        field: "Username",
+        message: "That username already exists!"
+      }
+    ],
+    "user": null
   }
 };

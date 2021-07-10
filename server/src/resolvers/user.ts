@@ -69,6 +69,20 @@ class UserResponse {
   user?: User | undefined
 }
 
+// @ObjectType()
+// class RegisterResponse {
+//   @Field(() => [UserFieldError], { nullable: true })
+//   errors?: UserFieldError[] | null
+
+//   @Field(() => User, { nullable: true })
+//   user?: User | undefined
+
+//   @Field(() => String)
+//   token?: String
+// }
+
+
+
 @Resolver()
 export class UserResolver {
 
@@ -92,14 +106,13 @@ export class UserResolver {
       const token = uuid.v4();
   
       //set the token with ioredis
-      const thing = await RedisClient.set(
+      await RedisClient.set(
         FORGET_PASS_PREFIX + token, //key
         user.id, //value type
         'ex', 
         1000 * 60 * 60 * 24 //token expires after 1 day
       );
 
-      console.log(thing);
   
       await sendEmail(email,
         `<a href="http://localhost:3000/change-password/${token}">Reset your password</a>`
@@ -132,7 +145,6 @@ export class UserResolver {
   
       const key = FORGET_PASS_PREFIX + token;
       const userId = await RedisClient.get(key)
-      console.log('user ID returned from REDIS CLIENT!!!', Promise.resolve(userId));
       if (!userId) 
       {
         const field = "token";
@@ -178,7 +190,6 @@ export class UserResolver {
   async me(
     @Ctx() { req }: MyContext
   ): Promise<User | undefined>{
-    console.log(req);
     
     // you are not logged in
     if (!req.session.userId) return undefined;
@@ -266,7 +277,6 @@ export class UserResolver {
       )
       .returning('*')
       .execute();
-      console.log('query builder result', result);
       //only returning the first user object in the array, 
       // i guess I could insert as many objects into the table and will
       // return more created objects into the raw array
@@ -275,6 +285,7 @@ export class UserResolver {
       //login the user after registration
       req.session.userId = user.id;
       req.session.username = user.username;
+      
       return {
         user
       };
@@ -321,10 +332,7 @@ export class UserResolver {
             message
           }
           user{
-            id
-            username
-            createdAt
-            updatedAt
+            email
           }
         }
     }
@@ -352,7 +360,6 @@ export class UserResolver {
     req.session.userId = user.id;
     req.session.welcomeBackMsg = `Welcome back ${user.username}!`;
     req.session.username = user.username;
-    console.log(req.session);
 
     return {
       user
@@ -362,7 +369,7 @@ export class UserResolver {
   @Mutation(() => Boolean)
   logout(
     @Ctx() {req, res}: MyContext
-  ){
+  ): Promise<boolean> {
     return new Promise
     (
       resolve => req.session.destroy

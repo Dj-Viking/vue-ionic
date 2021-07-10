@@ -37,8 +37,35 @@ export type MyContext = {
 
 export interface RegisterResponse {
     register: {
+        errors: null,
         user: {
             email: string
         }
     }
+}
+export interface RegisterErrorResponse {
+    register: {
+        errors: [
+            {
+                field: string,
+                message: string
+            }
+        ],
+        user: null
+    }
+}
+export interface LoginResponse {
+    login: {
+        user: {
+            email: string
+        }
+    }
+}
+export interface MeResponse {
+    me: {
+        email: string
+    }
+}
+export interface LogoutResponse {
+    logout: boolean
 }
