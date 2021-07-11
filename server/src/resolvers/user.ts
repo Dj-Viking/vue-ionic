@@ -186,15 +186,16 @@ export class UserResolver {
     }
   }
 
-  @Query(() => User, { nullable: true})
+  @Query(() => User, { nullable: true } )
   async me(
     @Ctx() { req }: MyContext
-  ): Promise<User | undefined>{
+  ): Promise<User | null>{
     
     // you are not logged in
-    if (!req.session.userId) return undefined;
+    if (!req.session.userId) return null;
 
     const user = await User.findOne(req.session.userId);
+    if (!user) return null;
     return user;
   }
 
@@ -292,8 +293,8 @@ export class UserResolver {
     } catch (error) {
       if (error.code === '23505' || error.detail && error.detail.includes('already exists'))
       {
-        const field = 'Username';
-        const message = "That username already exists!";
+        const field = 'User';
+        const message = "name or email is already taken already exists!";
         return new ErrorResponse(field, message);
       } else {
         const field = 'Error';

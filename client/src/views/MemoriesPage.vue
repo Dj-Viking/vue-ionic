@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
+import { defineComponent } from "vue";
 import { Memory, ListItemClass } from "../types";
 import { mapGetters } from "vuex";
 import { 
@@ -62,6 +62,7 @@ export default defineComponent({
   },
   created(): void {
     this.initList(this.memories);
+    console.log("creating instance");
   },
 });
 </script>

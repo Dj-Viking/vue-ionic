@@ -3,6 +3,9 @@ import { createStore } from "vuex";
 
 const store = createStore({
   state: {
+    user: {
+      me: null
+    },
     memories: [
       {
         id: 1,
@@ -27,8 +30,15 @@ const store = createStore({
       },
     ]
   },
-  mutations: {},
+  mutations: {
+    SET_USER(state, payload): void {
+      state.user = payload
+    }
+  },
   actions: {
+    setUser(context, payload): void {
+      return context.commit("SET_USER", payload);
+    },
     // eslint-disable-next-line
     async getOneMemory(context, payload: { id: string }): Promise<Memory> {
       try {
@@ -45,6 +55,7 @@ const store = createStore({
     // the state parameter passed in will be undefined
     // in the lexical context of `this` in the arrow function
     memories(state) { return state.memories; },
+    user(state){ return state.user; }
   }
 });
 

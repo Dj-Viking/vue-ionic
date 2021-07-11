@@ -13,3 +13,25 @@ export function createRegisterMutation(): string {
     }
   `;
 }
+export function createLoginMutation(): string {
+  return `
+    mutation login($options: LoginInput!) {
+      login(options: $options){
+        errors {
+          field
+          message
+        }
+        user{
+          email
+        }
+      }
+    }
+  `;
+}
+export function createLogoutMutation(): string {
+  return `
+    mutation logout{
+      logout
+    }
+  `;
+}
