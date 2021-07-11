@@ -28,8 +28,8 @@ export const startServer = async (): Promise<void> => {
   //start postgres db connection
   
   //heroku settings???
-
-
+  console.log("heroku pg settings", process.env.DATABASE_URL);
+  
 
   await createConnection({
     type: DB_TYPE as PostgresConnectionOptions["type"],
