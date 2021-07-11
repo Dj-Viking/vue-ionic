@@ -34,55 +34,68 @@ export const startServer = async (): Promise<void> => {
     synchronize: true, //usually true during dev
     entities: [User]
   });
-  // console.log("connection", connection);
 
   //setup express
   const app = express();
   const RedisStore = connectRedis(session);
-  const RedisClient = new Redis();
 
-  app.use(
-    cors({
-      origin: new RegExp(CORS_ALLOWED as string),
-      credentials: true
-    })
-  );
+  //set up the redis stuff provisioned on heroku
+  let redis_uri: URL;
+  let RedisClient: Redis.Redis;
+  if (process.env.REDIS_URL) {
+    redis_uri = new URL(process.env.REDIS_URL as string);
+    
+    RedisClient = new Redis(process.env.REDIS_URL, {
+      port: Number(redis_uri.port) + 1 || 6739,
+      host: redis_uri.hostname || "localhost",
+      password: redis_uri.password,
+      db: 0,
+      tls: {
+        rejectUnauthorized: !IS_PROD,
+        requestCert: IS_PROD,
+      }
+    });
 
-  //redis middleware for auth tokens
-  app.use(
-    session({
-      name: COOKIE_NAME,
-      store: new RedisStore({
-        client: RedisClient,
-        disableTouch: false,
-        host: 'localhost',
-        port: 6739,
-        ttl: 86400
+
+    app.use(cors({
+        origin: new RegExp(CORS_ALLOWED as string),
+        credentials: true
+    }));
+
+    //redis middleware for auth tokens
+    app.use(
+      session({
+        name: COOKIE_NAME,
+        store: new RedisStore({
+          client: RedisClient,
+          disableTouch: false,
+          ttl: 86400
+        }),
+        cookie: {
+          maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+          httpOnly: !IS_PROD as boolean, // if true cookie works in http
+          sameSite: "lax", //protecting csrf
+          secure: IS_PROD as boolean //cookie only works in https
+        },
+        secret: SECRET as string,
+        resave: false,
+        saveUninitialized: false
+      })
+    );
+
+    const apolloServer = new ApolloServer({
+      schema: await buildSchema({
+        resolvers: [UserResolver],
+        validate: false
       }),
-      cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-        httpOnly: !IS_PROD as boolean, // if true cookie works in http
-        sameSite: "lax", //protecting csrf
-        secure: IS_PROD as boolean //cookie only works in https
-      },
-      secret: SECRET as string,
-      resave: false,
-      saveUninitialized: false
-    })
-  );
+      context: ({ req, res }): MyContext => ({ req, res, RedisClient })
+    });
 
-  const apolloServer = new ApolloServer({
-    schema: await buildSchema({
-      resolvers: [UserResolver],
-      validate: false
-    }),
-    context: ({ req, res }): MyContext => ({ req, res, RedisClient })
-  });
-
-  apolloServer.applyMiddleware({
-    app,
-    cors: false
-  });
+    apolloServer.applyMiddleware({
+      app,
+      cors: false
+    });
+  }
   
   app.use('/', (_, res) => {
     res.status(403).send(null);
