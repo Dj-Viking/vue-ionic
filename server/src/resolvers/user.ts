@@ -294,7 +294,7 @@ export class UserResolver {
       if (error.code === '23505' || error.detail && error.detail.includes('already exists'))
       {
         const field = 'User';
-        const message = "name or email is already taken already exists!";
+        const message = "name and/or email is already taken!";
         return new ErrorResponse(field, message);
       } else {
         const field = 'Error';

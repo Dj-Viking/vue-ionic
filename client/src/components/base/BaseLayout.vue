@@ -121,9 +121,7 @@ export default defineComponent({
   },
   watch: {
     result: function(newValue: MeQueryResponse) {
-      console.log("result changed", newValue);
       this.setUser(newValue);
-      console.log("set user after result changed on base layout", this.user.me);
       if (this.user.me && this.user.me.username){
         this.isLoggedIn = true;
       } else {
@@ -138,13 +136,10 @@ export default defineComponent({
     "$route": function() {
       //get the user info on route change to get user state if logged in
       this.refetch();
-      console.log("route changed what is the user state", this.user);
       if (this.user.me && this.user.me.username) {
         this.isLoggedIn = true;
-        console.log("is user logged in", this.user);
       } else {
         this.isLoggedIn = false;
-        console.log("is user not logged in", this.user);
       }
     }
   },

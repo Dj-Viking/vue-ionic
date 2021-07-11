@@ -111,7 +111,6 @@ export default defineComponent({
     onLoginDone(result => {
       res.value = result.data;
       submitted.value = false;
-      console.log('result on login done', res);
     });
     function initFields(): void {
       submitted.value = false;
@@ -153,7 +152,6 @@ export default defineComponent({
         this.displayError(msg);
         this.resetError();
       } else {
-        console.log("new value of login response", newValue);
         this.setUser({me: newValue.login.user});
         this.successMsg = "Success!! teleporting to home page";
         setTimeout(() => {

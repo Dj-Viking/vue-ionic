@@ -62,7 +62,6 @@ export default defineComponent({
   },
   created(): void {
     this.initList(this.memories);
-    console.log("creating instance");
   },
 });
 </script>
