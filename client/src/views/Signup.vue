@@ -118,7 +118,6 @@ export default defineComponent({
     onRegisterDone(result => {
       res.value = result.data;
       submitted.value = false;
-      console.log('result on register done', res);
     });
     function initFields(): void {
       submitted.value = false;
@@ -176,14 +175,6 @@ export default defineComponent({
         }, 4000);
       }
     }
-  },
-  created(){
-    console.log("created in options");
-    
-  },
-  mounted(){
-    console.log("mounted in options", this.email);
-    
   },
 })
 </script>
