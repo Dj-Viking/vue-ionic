@@ -36,6 +36,8 @@ const cache = new InMemoryCache()
 const httpLink = createHttpLink({
   // You should use an absolute URL here
   uri: 'http://localhost:4000/graphql',
+  headers: {},
+  credentials: "include"
 });
 
 // Create the apollo client
