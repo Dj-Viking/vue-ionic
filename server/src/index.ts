@@ -1,4 +1,5 @@
 require('dotenv').config();
+import path from "path";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
@@ -63,25 +64,23 @@ export const startServer = async (): Promise<void> => {
     }));
 
     //redis middleware for auth tokens
-    app.use(
-      session({
-        name: COOKIE_NAME,
-        store: new RedisStore({
-          client: RedisClient,
-          disableTouch: false,
-          ttl: 86400
-        }),
-        cookie: {
-          maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-          httpOnly: !IS_PROD as boolean, // if true cookie works in http
-          sameSite: "lax", //protecting csrf
-          secure: IS_PROD as boolean //cookie only works in https
-        },
-        secret: SECRET as string,
-        resave: false,
-        saveUninitialized: false
-      })
-    );
+    app.use(session({
+      name: COOKIE_NAME,
+      store: new RedisStore({
+        client: RedisClient,
+        disableTouch: false,
+        ttl: 86400
+      }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+        httpOnly: !IS_PROD as boolean, // if true cookie works in http
+        sameSite: "lax", //protecting csrf
+        secure: IS_PROD as boolean //cookie only works in https
+      },
+      secret: SECRET as string,
+      resave: false,
+      saveUninitialized: false
+    }));
 
     const apolloServer = new ApolloServer({
       schema: await buildSchema({
@@ -95,6 +94,34 @@ export const startServer = async (): Promise<void> => {
       app,
       cors: false
     });
+    
+    //EXPRESS MIDDLEWARE FUNCTIONS
+    app.use(express.urlencoded({ 
+      extended: false 
+    }));
+    app.use(express.json());
+    //STATIC PUBLIC FRONT END ASSETS WHILE IN DEVELOPMENT
+    // app.use('/images', express.static(path.join(__dirname, '../client/images')));
+
+    //IF-ENV IN DEPLOYMENT
+    if (process.env.NODE_ENV === 'production') {
+      //STATIC ASSETS FROM VUE BUILD FOLDER
+      app.use(express.static(
+        path.join(__dirname, '../../client/dist')
+      ));
+      // IF TRAVELS ANY ROUTE OUTSIDE VUE'S CURRENT PAGE REDIRECT TO ROOT
+      app.get('*', (_req, res) => {
+        console.log("IN THE GET STAR");
+        res.sendFile(path.join(
+          __dirname, '../client/build/index.html'
+        ));
+      });
+      //REDIRECT HTTP TRAFFIC TO HTTPS
+      app.use((req, res, next) => {
+        if (req.header('x-forwarded-proto') !== 'https') res.redirect(`https://${req.header('host')}${req.url}`);
+        next();
+      });
+    }
   }
   
   app.use('/', (_, res) => {

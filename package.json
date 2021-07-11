@@ -10,7 +10,7 @@
     "start:prod": "cd server; npm run tsc; node ./dist/index.js; cd ../client; npm run serve",
     "start:dev": "concurrently \"cd server && npm run tsw && node ./dist/index.js\" \"cd client && npm run serve\"",
     "install": "cd server; npm i --verbose; cd ../client; npm i --verbose",
-    "heroku-postbuild": "npm run install; cd client && npm run build"
+    "heroku-postbuild": "npm run install; cd client; npm run build; npm run serve"
   },
   "repository": {
     "type": "git",
