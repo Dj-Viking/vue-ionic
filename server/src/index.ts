@@ -31,8 +31,8 @@ export const startServer = async (): Promise<void> => {
     database: DB_NAME as string,
     username: DB_USER as string,
     password: DB_PASSWORD as string,
-    logging: !IS_PROD, //dont log if we are in prod
-    synchronize: true, //usually true during dev
+    logging: true, //dont log if we are in prod
+    synchronize: !IS_PROD, //usually true during dev
     entities: [User]
   });
 
@@ -45,6 +45,7 @@ export const startServer = async (): Promise<void> => {
   let RedisClient: Redis.Redis;
   if (process.env.REDIS_URL) {
     redis_uri = new URL(process.env.REDIS_URL as string);
+    console.log("redis uri", redis_uri);
     
     RedisClient = new Redis(process.env.REDIS_URL, {
       port: Number(redis_uri.port) + 1 || 6739,
@@ -56,7 +57,8 @@ export const startServer = async (): Promise<void> => {
         requestCert: IS_PROD,
       }
     });
-
+    console.log("redis client", RedisClient);
+    
 
     app.use(cors({
         origin: new RegExp(CORS_ALLOWED as string),
@@ -111,7 +113,6 @@ export const startServer = async (): Promise<void> => {
       ));
       // IF TRAVELS ANY ROUTE OUTSIDE VUE'S CURRENT PAGE REDIRECT TO ROOT
       app.get('*', (_req, res) => {
-        console.log("IN THE GET STAR");
         res.sendFile(path.join(
           __dirname, '../client/dist/index.html'
         ));
