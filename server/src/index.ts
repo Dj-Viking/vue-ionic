@@ -94,7 +94,7 @@ export const startServer = async (): Promise<void> => {
       app,
       cors: false
     });
-    
+
     //EXPRESS MIDDLEWARE FUNCTIONS
     app.use(express.urlencoded({ 
       extended: false 
@@ -113,7 +113,7 @@ export const startServer = async (): Promise<void> => {
       app.get('*', (_req, res) => {
         console.log("IN THE GET STAR");
         res.sendFile(path.join(
-          __dirname, '../client/build/index.html'
+          __dirname, '../client/dist/index.html'
         ));
       });
       //REDIRECT HTTP TRAFFIC TO HTTPS
