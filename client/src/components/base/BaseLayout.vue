@@ -77,7 +77,7 @@ import {
   IonButtons,
   IonButton
 } from "@ionic/vue";
-import { MeQueryResponse } from "../../types";
+import { LogoutResponse, MeQueryResponse } from "../../types";
 
 export default defineComponent({
   setup(){
@@ -128,8 +128,8 @@ export default defineComponent({
         this.isLoggedIn = false;
       }
     },
-    logoutRes: function(newValue) {
-      if (newValue){
+    logoutRes: function(newValue: LogoutResponse) {
+      if (newValue.logout){
         this.setUser({me: null});
       }
     },

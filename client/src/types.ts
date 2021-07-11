@@ -63,6 +63,9 @@ export interface LoginResponse {
 		};
 	};
 }
+export interface LogoutResponse {
+	logout: boolean;
+}
 /**
  * expected me query response
  */
