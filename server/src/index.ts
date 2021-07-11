@@ -29,6 +29,7 @@ export const startServer = async (): Promise<void> => {
   await createConnection({
     type: DB_TYPE as PostgresConnectionOptions["type"],
     database: DB_NAME as string,
+    port: 5432,
     username: DB_USER as string,
     password: DB_PASSWORD as string,
     logging: true, //dont log if we are in prod
