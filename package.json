@@ -7,7 +7,7 @@
     "test:register": "cd server; npm run test register",
     "test:login": "cd server; npm run test login",
     "start": "if-env NODE_ENV=production && npm run start:prod",
-    "start:prod": "cd server; npm run tsc; redis-server; node ./dist/index.js",
+    "start:prod": "cd server; npm run tsc; node ./dist/index.js",
     "start:dev": "concurrently \"cd server && npm run tsw && node ./dist/index.js\" \"cd client && npm run serve\"",
     "install": "cd server; npm i --verbose; cd ../client; npm i --verbose",
     "heroku-postbuild": "cd client; npm run build; cd ../server; npm start"
