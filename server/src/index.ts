@@ -125,7 +125,9 @@ export const startServer = async (): Promise<void> => {
   }
   
   app.use('/', (_, res) => {
-    res.status(403).send(null);
+    res.status(200).sendFile(path.join(
+      __dirname, '../client/dist/index.html'
+    ));
   });
 
   const PORT = process.env.PORT || 4000;
