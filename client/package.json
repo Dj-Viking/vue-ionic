@@ -42,9 +42,7 @@
     "@vue/cli-plugin-unit-jest": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0-0",
     "@vue/eslint-config-typescript": "^5.0.2",
-    "@vue/test-utils": "^2.0.0-0"
-  },
-  "devDependencies": {
+    "@vue/test-utils": "^2.0.0-0",
     "@capacitor/cli": "3.0.2",
     "@types/jest": "^24.0.19",
     "@types/node": "^15.12.5",
@@ -54,6 +52,9 @@
     "eslint-plugin-vue": "^7.0.0-0",
     "typescript": "~3.9.3",
     "vue-jest": "^5.0.0-0"
+  },
+  "devDependencies": {
+
   },
   "description": "An Ionic project"
 }
