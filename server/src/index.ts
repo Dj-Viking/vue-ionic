@@ -40,7 +40,7 @@ export const startServer = async (): Promise<void> => {
     logging: true, //dont log if we are in prod
     synchronize: !IS_PROD, //usually true during dev
     extra: {
-      ssl: true
+      ssl: IS_PROD ? { rejectedUnauthorized: false } : false
     },
     entities: [User]
   });
