@@ -7,18 +7,22 @@ import Login from "../views/Login.vue"
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
+    name: "home",
     component: MemoriesPage
   },
   {
     path: '/login',
+    name: "login",
     component: Login
   },
   {
     path: '/signup',
+    name: "signup",
     component: Signup
   },
   {
     path: '/memories/:id',
+    name: "memoryDetail",
     component: () => import("../views/MemoryDetails.vue")
   }
 ]

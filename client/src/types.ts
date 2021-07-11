@@ -16,7 +16,11 @@ export class ListItemClass implements Memory {
     });
   }
 }
-
+export interface RegisterArgs {
+  email: string;
+  username: string;
+  password: string;
+}
 export interface RegisterResponse {
   register: {
       errors: null 
