@@ -1,9 +1,18 @@
 <template>
-  <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  <div class="lds-roller">
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue-demi";
+import { defineComponent } from "vue";
 
 export default defineComponent({})
 </script>
@@ -17,19 +26,11 @@ export default defineComponent({})
     transform: rotate(360deg);
   }
 }
-.form-btn:hover {
-  animation-name: buttonHoverAnim;
-  animation-timing-function: ease-in-out;
-  animation-delay: 0s;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-  animation-duration: 5s;
-}
 .lds-roller {
-  display: inline-block;
+  display: block;
   position: relative;
   width: 80px;
-  height: 80px;
+  height: 20px;
 }
 .lds-roller div {
   animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;

@@ -4,7 +4,15 @@
   >
     <form 
       style="margin: 0 auto;"
-      @submit="submit($event)"
+      @submit.prevent="() => {
+        submitRegister({
+          options: {
+            email,
+            username,
+            password
+          }
+        })
+      }"
     >
       <div
         style="
@@ -15,6 +23,9 @@
           align-items: center;
         "
       >
+
+        <input type="submit" style="display: none;">
+
         <ion-label>
           Username
         </ion-label>
@@ -36,12 +47,12 @@
             }
           })
         }">
-          <span v-if="!showSpinner">
+          <span v-if="!registerIsLoading && !showSpinner">
             SIGN UP 
           </span>
-          <span v-if="registerIsLoading || showSpinner">
+          <div style="width: 100%; height: 100%" v-if="registerIsLoading || (showSpinner && submitted)">
             <Spinner />
-          </span>
+          </div>
         </ion-button>
         
         <div v-if="isError">
@@ -65,7 +76,7 @@ import {
   IonInput, 
   IonButton
 } from '@ionic/vue';
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import BaseLayout from "../components/base/BaseLayout.vue";
 import router from "../router";
 import Spinner from "../components/spinner.vue";
@@ -82,33 +93,42 @@ import {
  */
 export default defineComponent({
   setup() {
-    const email = ref('');
-    const username = ref('');
-    const password = ref('');
+    const email = ref("");
+    const username = ref("");
+    const password = ref("");
     const res = ref({});
+    const submitted = ref(false);
     // here the call to useMutation can resolve your component
     const { 
       mutate: submitRegister, 
       loading: registerIsLoading, 
       error: registerError, 
       onDone: onRegisterDone 
-    } = 
-      useMutation(
-        gql`${createRegisterMutation()}`, {
-          variables: {
-            options: {
-              email: email.value,
-              username: username.value,
-              password: password.value
-            }
+    } = useMutation(
+      gql`${createRegisterMutation()}`, {
+        variables: {
+          options: {
+            email: email.value,
+            username: username.value,
+            password: password.value
           }
         }
-      );
+      }
+    );
     onRegisterDone(result => {
       res.value = result.data;
+      submitted.value = false;
       console.log('result on register done', res);
     });
-    return { submitRegister, email, username, password, registerIsLoading, registerError, res };
+    function initFields(): void {
+      submitted.value = false;
+      email.value = "";
+      username.value = "";
+      password.value = "";
+    }
+    onMounted(initFields);
+
+    return { submitRegister, email, username, password, registerIsLoading, registerError, res, submitted };
   },
   components: {
     BaseLayout,
@@ -121,7 +141,6 @@ export default defineComponent({
     return {
       isError: false,
       errMsg: "",
-      isSubmitted: false,
       successMsg: "",
       showSpinner: false
     }
@@ -129,42 +148,42 @@ export default defineComponent({
   methods: {
     displayError(msg: string): void {
       this.isError = true;
+      this.showSpinner = false;
+      this.submitted = false;
       this.errMsg = msg;
     },
     resetError(): void {
       setTimeout(() => {
         this.isError = false;
+        this.submitted = false;
       }, 3000);
     }
   },
   watch: {
-    submitted: function(newValue: boolean) {
-      console.log("submitted changed", newValue);
-      
-    },
-    email: function(newValue){
-      console.log("new email value watched", newValue);
-    },
-    username: function(newValue){
-      console.log("new username value watched", newValue);
-    },
-    password: function(newValue){
-      console.log("new password value watched", newValue);
-    },
     res: function(newValue: RegisterResponse) {
+      this.showSpinner = true;
+      this.submitted = true;
       if (newValue.register.errors && newValue.register.errors.length) {
         const msg = newValue.register.errors[0].message;
         this.displayError(msg);
         this.resetError();
       } else {
         this.successMsg = "Success!! teleporting to home page";
-          this.showSpinner = true;
         setTimeout(() => {
           this.showSpinner = false;
-          router.push({ name: "home" })
+          this.submitted = false;
+          router.back();
         }, 4000);
       }
     }
+  },
+  created(){
+    console.log("created in options");
+    
+  },
+  mounted(){
+    console.log("mounted in options", this.email);
+    
   },
 })
 </script>
@@ -174,5 +193,8 @@ export default defineComponent({
     border: solid black 1px;
     background-color: #325bff5f;
     border-radius: 10px;
+  }
+  ion-button {
+    height: 80px;
   }
 </style>

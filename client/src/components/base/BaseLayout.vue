@@ -8,20 +8,19 @@
             ></ion-back-button>
           </ion-buttons>
           <ion-buttons slot="end">
+
             <ion-button
-              :href="
-                isHome ? '/login' : '/'
-              "
+              @click="() => isHome ? router.push({ name: 'login' }) : router.back()"
             >
               {{ !isHome ? "Home" : "Login" }}
             </ion-button>
+
             <ion-button
-              :href="
-                isHome ? '/signup' : '/'
-              "
+              @click="() => router.push({ name: 'signup' })"
             >
               {{ !isHome ? null : "Signup" }}
             </ion-button>
+
           </ion-buttons>
           <ion-title>
             {{ pageTitle }}
@@ -37,6 +36,7 @@
 <script lang="ts">
 //get like a global auth class to check if the page we are looking at while authenticated on should have a different look
 import { defineComponent } from "@vue/runtime-core";
+import router from "../../router";
 import { 
   IonPage, 
   IonHeader, 
@@ -49,6 +49,11 @@ import {
 } from "@ionic/vue";
 
 export default defineComponent({
+  data() {
+    return {
+      router: router
+    }
+  },
   props: {
     pageTitle: String,
     pageDefaultBackLink: String,
