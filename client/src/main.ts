@@ -35,7 +35,7 @@ const cache = new InMemoryCache()
 // HTTP connection to the API
 const httpLink = createHttpLink({
   // You should use an absolute URL here
-  uri: process.env.NODE_ENV === "development" ? "http://localhost:4000/graphql" : "https://https://ionic-lang.herokuapp.com/graphql",
+  uri: process.env.NODE_ENV === "development" ? "http://localhost:4000/graphql" : "/graphql",
   headers: {},
   credentials: "include"
 });

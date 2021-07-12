@@ -50,6 +50,7 @@ export const startServer = async (): Promise<void> => {
 
   //set up the redis stuff provisioned on heroku
   let RedisClient: Redis.Redis;
+  let apolloServer: ApolloServer;
   if (process.env.REDIS_TLS_URL) {
     RedisClient = new Redis(process.env.REDIS_TLS_URL, {
       db: 0,
@@ -64,13 +65,10 @@ export const startServer = async (): Promise<void> => {
       validate: false
     });
 
-    app.use(
-      '/graphql',
-      graphqlHTTP({
-        schema: MyGraphQLSchema,
-        graphiql: process.env.NODE_ENV === 'development',
-      }),
-    );
+    app.use('/graphql', graphqlHTTP({
+      schema: MyGraphQLSchema,
+      graphiql: process.env.NODE_ENV === 'development',
+    }));
 
     app.use(cors({
         origin: new RegExp(CORS_ALLOWED as string),
@@ -96,10 +94,8 @@ export const startServer = async (): Promise<void> => {
       saveUninitialized: false
     }));
 
-    const apolloServer = new ApolloServer({
+    apolloServer = new ApolloServer({
       schema: MyGraphQLSchema,
-      introspection: true,
-      playground: true,
       context: ({ req, res }): MyContext => ({ req, res, RedisClient })
     });
 
@@ -145,17 +141,22 @@ export const startServer = async (): Promise<void> => {
   app.listen(PORT, () => {
     console.log(
       ANSI_ESCAPES.yellow,
-      `server started on localhost:${PORT}`,
+      `server started on ${PORT}`,
       ANSI_ESCAPES.reset
     );
+    console.log(
+      ANSI_ESCAPES.purple,
+      `graphql started? ${apolloServer.graphqlPath}`
+    );
+    
   });
 
 
 }
 startServer().catch((e: Error) => console.log(
-                                      ANSI_ESCAPES.red, 
-                                      `error while server started ` + e.name + ' ' + e.stack, 
-                                      ANSI_ESCAPES.reset));
+                                              ANSI_ESCAPES.red, 
+                                              `error while server started ` + e.name + ' ' + e.stack, 
+                                              ANSI_ESCAPES.reset));
 /** graph ql settings
  * {
   "editor.cursorShape": "line",
