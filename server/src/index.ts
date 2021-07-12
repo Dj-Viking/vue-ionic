@@ -31,9 +31,15 @@ export const startServer = async (): Promise<void> => {
   await createConnection({
     type: "postgres",
     url: IS_PROD ? process.env.DATABASE_URL : undefined,
+    password: process.env.DB_PASSWORD,
     logging: true, //dont log if we are in prod
     synchronize: !IS_PROD, //usually true during dev
-    ssl: { rejectUnauthorized: false },
+    ssl: IS_PROD,
+    extra: {
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
     entities: [User]
   });
 
