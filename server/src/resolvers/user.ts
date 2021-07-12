@@ -191,9 +191,6 @@ export class UserResolver {
     @Ctx() { req }: MyContext
   ): Promise<User | null | ErrorResponse>{
 
-    console.log(req);
-    
-
     try {
       // you are not logged in
       if (!req.session.userId) return null;
