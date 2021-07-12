@@ -27,7 +27,7 @@ import "./theme/variables.css";
 import "./theme/core.css";
 
 //apollo stuff
-import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core';
+import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client/core";
 import { DefaultApolloClient } from "@vue/apollo-composable";
 
 // Cache implementation
@@ -35,7 +35,7 @@ const cache = new InMemoryCache()
 // HTTP connection to the API
 const httpLink = createHttpLink({
   // You should use an absolute URL here
-  uri: 'http://localhost:4000/graphql',
+  uri: process.env.NODE_ENV === "development" ? "http://localhost:4000/graphql" : "https://https://ionic-lang.herokuapp.com/graphql",
   headers: {},
   credentials: "include"
 });
@@ -44,7 +44,7 @@ const httpLink = createHttpLink({
 const apolloClient = new ApolloClient({
   link: httpLink,
   cache,
-  credentials: 'include',
+  credentials: "include",
 });
 const app = createApp({
   setup() {

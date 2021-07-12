@@ -4,6 +4,7 @@ import "reflect-metadata";
 import { createConnection } from "typeorm";
 // import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 import express from "express";
+import { graphqlHTTP } from "express-graphql";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
@@ -57,7 +58,19 @@ export const startServer = async (): Promise<void> => {
         requestCert: IS_PROD,
       }
     });
-    
+
+    const MyGraphQLSchema = await buildSchema({
+      resolvers: [UserResolver],
+      validate: false
+    });
+
+    app.use(
+      '/graphql',
+      graphqlHTTP({
+        schema: MyGraphQLSchema,
+        graphiql: process.env.NODE_ENV === 'development',
+      }),
+    );
 
     app.use(cors({
         origin: new RegExp(CORS_ALLOWED as string),
@@ -84,10 +97,7 @@ export const startServer = async (): Promise<void> => {
     }));
 
     const apolloServer = new ApolloServer({
-      schema: await buildSchema({
-        resolvers: [UserResolver],
-        validate: false
-      }),
+      schema: MyGraphQLSchema,
       introspection: true,
       playground: true,
       context: ({ req, res }): MyContext => ({ req, res, RedisClient })
@@ -104,7 +114,6 @@ export const startServer = async (): Promise<void> => {
     }));
     app.use(express.json());
     //STATIC PUBLIC FRONT END ASSETS WHILE IN DEVELOPMENT
-    // app.use('/images', express.static(path.join(__dirname, '../client/images')));
 
     //IF-ENV IN DEPLOYMENT
     if (process.env.NODE_ENV === 'production') {
