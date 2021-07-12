@@ -28,18 +28,12 @@ export const startServer = async (): Promise<void> => {
   //start postgres db connection
   
   //heroku settings???
-  console.log("heroku pg settings", process.env.DATABASE_URL);
-  
-
   await createConnection({
     type: "postgres",
     url: IS_PROD ? process.env.DATABASE_URL : undefined,
     logging: true, //dont log if we are in prod
     synchronize: !IS_PROD, //usually true during dev
-    extra: {
-      ssl: IS_PROD,
-      rejectUnauthorized: false
-    },
+    ssl: { rejectUnauthorized: false },
     entities: [User]
   });
 
