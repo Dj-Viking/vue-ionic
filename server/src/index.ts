@@ -146,7 +146,8 @@ export const startServer = async (): Promise<void> => {
     );
     console.log(
       ANSI_ESCAPES.purple,
-      `graphql started? ${apolloServer.graphqlPath}`
+      `graphql started? ${apolloServer.graphqlPath}`,
+      ANSI_ESCAPES.reset
     );
     
   });
