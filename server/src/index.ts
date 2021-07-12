@@ -98,7 +98,9 @@ export const startServer = async (): Promise<void> => {
 
 		apolloServer.applyMiddleware({
 			app,
-			cors: false
+			cors: {
+				credentials: true
+			},
 		});
 
 		app.use('/graphql', graphqlHTTP((req, res) => ({
