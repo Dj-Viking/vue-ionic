@@ -39,9 +39,7 @@ export const startServer = async (): Promise<void> => {
     password: !IS_PROD ? DB_PASSWORD as string: undefined,
     logging: true, //dont log if we are in prod
     synchronize: !IS_PROD, //usually true during dev
-    extra: {
-      ssl: IS_PROD ? { rejectedUnauthorized: false } : false
-    },
+    ssl: IS_PROD ? { rejectUnauthorized: true } : false,
     entities: [User]
   });
 
