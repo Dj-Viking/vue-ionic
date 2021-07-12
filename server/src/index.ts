@@ -50,11 +50,11 @@ export const startServer = async (): Promise<void> => {
   //set up the redis stuff provisioned on heroku
   let redis_uri: URL;
   let RedisClient: Redis.Redis;
-  if (process.env.REDIS_URL) {
-    redis_uri = new URL(process.env.REDIS_URL as string);
+  if (process.env.REDIS_TLS_URL) {
+    redis_uri = new URL(process.env.REDIS_TLS_URL as string);
     console.log("redis uri", redis_uri);
     
-    RedisClient = new Redis(process.env.REDIS_URL, {
+    RedisClient = new Redis(process.env.REDIS_TLS_URL, {
       // port: Number(redis_uri.port) + 1 || 6739,
       // host: redis_uri.hostname || "localhost",
       // password: redis_uri.password,
