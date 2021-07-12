@@ -191,7 +191,7 @@ export class UserResolver {
     @Ctx() { req }: MyContext
   ): Promise<User | null | ErrorResponse>{
 
-    console.log(req.session);
+    console.log(req);
     
 
     try {
