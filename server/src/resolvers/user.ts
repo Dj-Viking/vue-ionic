@@ -189,15 +189,19 @@ export class UserResolver {
   @Query(() => User, { nullable: true } )
   async me(
     @Ctx() { req }: MyContext
-  ): Promise<User | null>{
-    
+  ): Promise<User | null | ErrorResponse>{
 
-    // you are not logged in
-    if (!req.session.userId) return null;
-
-    const user = await User.findOne(req.session.userId);
-    if (!user) return null;
-    return user;
+    try {
+      // you are not logged in
+      if (!req.session.userId) return null;
+  
+      const user = await User.findOne(req.session.userId);
+      if (!user) return null;
+      return user;
+      
+    } catch (error) {
+      return new ErrorResponse("error", error);
+    }
   }
 
   /**
