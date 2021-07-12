@@ -2,7 +2,7 @@ require('dotenv').config();
 import path from "path";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
+// import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 import express from "express";
 import session from "express-session";
 import connectRedis from "connect-redis";
@@ -15,10 +15,10 @@ import { User } from "./entities/User";
 import { UserResolver } from './resolvers/user';
 import { MyContext, ANSI_ESCAPES } from "./types";
 const {
-  DB_NAME,
-  DB_USER,
-  DB_TYPE,
-  DB_PASSWORD,
+  // DB_NAME,
+  // DB_USER,
+  // DB_TYPE,
+  // DB_PASSWORD,
   SECRET,
   CORS_ALLOWED
 } = process.env;
@@ -32,11 +32,8 @@ export const startServer = async (): Promise<void> => {
   
 
   await createConnection({
-    type: DB_TYPE as PostgresConnectionOptions["type"],
-    database: !IS_PROD ? DB_NAME as string : undefined,
-    username: !IS_PROD ? DB_USER as string : undefined,
+    type: "postgres",
     url: IS_PROD ? process.env.DATABASE_URL : undefined,
-    password: !IS_PROD ? DB_PASSWORD as string: undefined,
     logging: true, //dont log if we are in prod
     synchronize: !IS_PROD, //usually true during dev
     ssl: IS_PROD ? { rejectUnauthorized: true } : false,
