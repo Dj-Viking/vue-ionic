@@ -65,10 +65,12 @@ export const startServer = async (): Promise<void> => {
       validate: false
     });
 
-    app.use('/graphql', graphqlHTTP({
+    app.use('/graphql', graphqlHTTP((req, res) => ({
       schema: MyGraphQLSchema,
-      graphiql: process.env.NODE_ENV === 'development',
-    }));
+      context: { session: { req, res } /* other things will be ignored ... */ },
+      graphiql: !IS_PROD
+      // or without the `session` property
+    })));
 
     app.use(cors({
         origin: new RegExp(CORS_ALLOWED as string),
