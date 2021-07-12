@@ -4,7 +4,7 @@ import "reflect-metadata";
 import { createConnection } from "typeorm";
 // import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 import express from "express";
-import { graphqlHTTP } from "express-graphql";
+// import { graphqlHTTP } from "express-graphql";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
@@ -107,15 +107,15 @@ export const startServer = async (): Promise<void> => {
 		},
 	});
 
-	app.use('/graphql', (req, res) => {
-		console.log('request object in the /graphql request', req);
+	// app.use('/graphql', (req, res) => {
+	// 	console.log('request object in the /graphql request', req);
 		
-		return graphqlHTTP({
-			schema: MyGraphQLSchema,
-			graphiql: true, // or whatever you want
-			context: { req, res },
-		})(req, res);
-	});
+	// 	return graphqlHTTP({
+	// 		schema: MyGraphQLSchema,
+	// 		graphiql: !IS_PROD, // or whatever you want
+	// 		context: { req, res },
+	// 	})(req, res);
+	// });
 
 	//EXPRESS MIDDLEWARE FUNCTIONS
 	app.use(express.urlencoded({
