@@ -67,7 +67,7 @@ export const startServer = async (): Promise<void> => {
 
     app.use('/graphql', graphqlHTTP((req, res) => ({
       schema: MyGraphQLSchema,
-      context: { session: { req, res } /* other things will be ignored ... */ },
+      context: { session: <MyContext>{ req, res, RedisClient } /* other things will be ignored ... */ },
       graphiql: !IS_PROD
       // or without the `session` property
     })));
