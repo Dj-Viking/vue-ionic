@@ -89,6 +89,7 @@ export const startServer = async (): Promise<void> => {
         validate: false
       }),
       introspection: true,
+      playground: true,
       context: ({ req, res }): MyContext => ({ req, res, RedisClient })
     });
 
