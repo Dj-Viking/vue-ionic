@@ -34,7 +34,7 @@ export const startServer = async (): Promise<void> => {
     url: IS_PROD ? process.env.DATABASE_URL : undefined,
     password: process.env.DB_PASSWORD,
     logging: true, //dont log if we are in prod
-    synchronize: !IS_PROD, //usually true during dev
+    synchronize: true, 
     ssl: IS_PROD,
     extra: {
       ssl: {
@@ -64,13 +64,6 @@ export const startServer = async (): Promise<void> => {
       resolvers: [UserResolver],
       validate: false
     });
-
-    app.use('/graphql', graphqlHTTP((req, res) => ({
-      schema: MyGraphQLSchema,
-      context: { session: <MyContext>{ req, res, RedisClient } /* other things will be ignored ... */ },
-      graphiql: !IS_PROD
-      // or without the `session` property
-    })));
 
     app.use(cors({
         origin: new RegExp(CORS_ALLOWED as string),
@@ -105,6 +98,13 @@ export const startServer = async (): Promise<void> => {
       app,
       cors: false
     });
+
+    app.use('/graphql', graphqlHTTP((req, res) => ({
+      schema: MyGraphQLSchema,
+      context: { session: <MyContext>{ req, res, RedisClient } /* other things will be ignored ... */ },
+      graphiql: !IS_PROD
+      // or without the `session` property
+    })));
 
     //EXPRESS MIDDLEWARE FUNCTIONS
     app.use(express.urlencoded({ 
