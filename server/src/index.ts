@@ -48,24 +48,15 @@ export const startServer = async (): Promise<void> => {
   const RedisStore = connectRedis(session);
 
   //set up the redis stuff provisioned on heroku
-  let redis_uri: URL;
   let RedisClient: Redis.Redis;
   if (process.env.REDIS_TLS_URL) {
-    redis_uri = new URL(process.env.REDIS_TLS_URL as string);
-    console.log("redis uri", redis_uri);
-    
     RedisClient = new Redis(process.env.REDIS_TLS_URL, {
-      // port: Number(redis_uri.port) + 1 || 6739,
-      // host: redis_uri.hostname || "localhost",
-      // password: redis_uri.password,
-      // connectTimeout: 10000,
       db: 0,
       tls: {
         rejectUnauthorized: !IS_PROD,
         requestCert: IS_PROD,
       }
     });
-    console.log("redis client", RedisClient);
     
 
     app.use(cors({
@@ -97,6 +88,7 @@ export const startServer = async (): Promise<void> => {
         resolvers: [UserResolver],
         validate: false
       }),
+      introspection: true,
       context: ({ req, res }): MyContext => ({ req, res, RedisClient })
     });
 
