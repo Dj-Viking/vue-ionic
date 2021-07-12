@@ -49,11 +49,12 @@ export const startServer = async (): Promise<void> => {
 	const app = express();
 	const RedisStore = connectRedis(session);
 
-	//set up the redis stuff provisioned on heroku
 	let RedisClient: Redis.Redis;
 	let apolloServer: ApolloServer;
 	let MyGraphQLSchema: GraphQLSchema;
+
 	if (process.env.REDIS_TLS_URL) {
+
 		RedisClient = new Redis(process.env.REDIS_TLS_URL, {
 			db: 0,
 			tls: {
@@ -103,10 +104,13 @@ export const startServer = async (): Promise<void> => {
 			},
 		});
 
-		app.use('/graphql', graphqlHTTP((req, res) => ({
-			schema: MyGraphQLSchema,
-			context: { req, res } 
-		})));
+		app.use('/graphql', (req, res) => {
+			return graphqlHTTP({
+				schema: MyGraphQLSchema,
+				graphiql: true, // or whatever you want
+				context: { req, res },
+			})(req, res);
+		});
 
 		//EXPRESS MIDDLEWARE FUNCTIONS
 		app.use(express.urlencoded({
@@ -158,10 +162,9 @@ export const startServer = async (): Promise<void> => {
 
 
 }
-startServer().catch((e: Error) => console.log(
-											  ANSI_ESCAPES.red,
-											  `error while server started ` + e.name + ' ' + e.stack,
-											  ANSI_ESCAPES.reset));
+startServer().catch((e: Error) => console.log(ANSI_ESCAPES.red,
+											  											`error while server started ` + e.name + ' ' + e.stack,
+											  											ANSI_ESCAPES.reset));
 /** graph ql settings
  * {
   "editor.cursorShape": "line",
