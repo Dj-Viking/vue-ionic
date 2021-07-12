@@ -36,7 +36,9 @@ export const startServer = async (): Promise<void> => {
     url: IS_PROD ? process.env.DATABASE_URL : undefined,
     logging: true, //dont log if we are in prod
     synchronize: !IS_PROD, //usually true during dev
-    ssl: IS_PROD ? { rejectUnauthorized: true } : false,
+    extra: {
+      ssl: IS_PROD ? { rejectUnauthorized: true } : false,
+    },
     entities: [User]
   });
 
