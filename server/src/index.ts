@@ -58,6 +58,7 @@ export const startServer = async (): Promise<void> => {
       port: Number(redis_uri.port) + 1 || 6739,
       host: redis_uri.hostname || "localhost",
       password: redis_uri.password,
+      connectTimeout: 10000,
       db: 0,
       tls: {
         rejectUnauthorized: !IS_PROD,
