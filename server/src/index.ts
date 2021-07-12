@@ -108,6 +108,8 @@ export const startServer = async (): Promise<void> => {
 	});
 
 	app.use('/graphql', (req, res) => {
+		console.log('request object in the /graphql request', req);
+		
 		return graphqlHTTP({
 			schema: MyGraphQLSchema,
 			graphiql: true, // or whatever you want
