@@ -86,7 +86,7 @@ export const startServer = async (): Promise<void> => {
 		cookie: {
 			maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
 			httpOnly: !IS_PROD as boolean, // if true cookie works in http
-			sameSite: "lax", //protecting csrf
+			sameSite: "none", //protecting csrf
 			secure: IS_PROD as boolean //cookie only works in https
 		},
 		secret: SECRET as string,
