@@ -288,9 +288,15 @@ export class UserResolver {
       // return more created objects into the raw array
       user = result.raw[0];
 
+      //cookie method....not working in production for some reason....sets cookie locally but not in prod...frustrating
       //login the user after registration
-      req.session.userId = user.id;
-      req.session.username = user.username;
+      // req.session.userId = user.id;
+      // req.session.username = user.username;
+      req.user = {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      } as MyContext["req"]["user"]
       
       return {
         user

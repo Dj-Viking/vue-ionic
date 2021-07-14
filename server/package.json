@@ -54,6 +54,7 @@
     "graphql-request": "^3.4.0",
     "ioredis": "^4.27.6",
     "jest": "^27.0.6",
+    "jsonwebtoken": "^8.5.1",
     "nodemailer": "^6.6.2",
     "nodemon": "^2.0.9",
     "pg": "^8.6.0",
