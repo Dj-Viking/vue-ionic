@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { LoginResponse, LogoutResponse, MeResponse, RegisterErrorResponse, RegisterResponse } from "./types";
+import { LogoutResponse, MeResponse } from "./types";
 
 const {
   TEST_EMAIL,
@@ -52,6 +52,7 @@ mutation register {
     password: "${REGISTER_PASSWORD}",
     username: "${REGISTER_USERNAME}"
   }){
+    token
     errors {
       field
       message
@@ -78,44 +79,13 @@ mutation login {
     email: "${REGISTER_EMAIL}",
     password: "${REGISTER_PASSWORD}",
   }){
-    user{
+    errors {
+      field
+      message
+    }
+    token
+    user {
       email
     }
   }
 }`;
-
-/**
- * the response we should be getting from the graphql translation layer to the postgresql db
- */
-export const CORRECT_LOGIN_RESPONSE: LoginResponse = {
-  "login": {
-    "user": {
-      "email": `${REGISTER_EMAIL}`,
-    },
-  }
-};
-/**
- * the response we should be getting from the graphql translation layer to the postgresql db
- */
-export const CORRECT_REGISTER_RESPONSE: RegisterResponse = {
-  "register": {
-    "errors": null,
-    "user": {
-      "email": `${REGISTER_EMAIL}`,
-    },
-  }
-};
-/**
- * the response we should be getting from the graphql translation layer to the postgresql db
- */
-export const CORRECT_REGISTER_ERROR: RegisterErrorResponse = {
-  "register": {
-    "errors": [
-      {
-        field: "Username",
-        message: "That username already exists!"
-      }
-    ],
-    "user": null
-  }
-};

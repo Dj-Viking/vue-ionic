@@ -167,8 +167,8 @@ export const startServer = async (): Promise<void> => {
 
 }
 startServer().catch((e: Error) => console.log(ANSI_ESCAPES.red,
-  `error while server started ` + e.name + ' ' + e.stack,
-  ANSI_ESCAPES.reset));
+                                              `error while server started ` + e.name + ' ' + e.stack,
+                                              ANSI_ESCAPES.reset));
 /** graph ql settings
  * {
   "editor.cursorShape": "line",

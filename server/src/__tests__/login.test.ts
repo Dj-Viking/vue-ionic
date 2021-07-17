@@ -2,10 +2,8 @@ import { request } from "graphql-request";
 import { User } from "../entities/User";
 // import { User } from "../entities/User";
 import { 
-  CORRECT_LOGIN_RESPONSE, 
   CORRECT_LOGOUT_RESPONSE, 
   CORRECT_ME_RESPONSE, 
-  CORRECT_REGISTER_RESPONSE, 
   HOST, 
   LOGIN_MUTATION, 
   LOGOUT_MUTATION, 
@@ -14,7 +12,7 @@ import {
   REGISTER_MUTATION 
 } from "../constants";
 import { connectDb } from "./utils/connectDb";
-import { ANSI_ESCAPES } from "../types";
+import { ANSI_ESCAPES, LoginResponse, RegisterResponse } from "../types";
 import { logJson } from "./utils/helpers";
 // import { connectDb } from "./utils/connectDb";
 
@@ -29,16 +27,17 @@ describe("log a cookie", () => {
 describe("register first and then use the same credentials to test login mutation", () => {
   it("get expected response from the register mutation", async () => {
     console.log(`${ANSI_ESCAPES.blue}`, `Registering a new user`, `${ANSI_ESCAPES.reset}`);
-    const res = await request(HOST + "/graphql", REGISTER_MUTATION);
+    const res: RegisterResponse = await request(HOST + "/graphql", REGISTER_MUTATION);
     logJson(res);
-    expect(res).toEqual(CORRECT_REGISTER_RESPONSE);
+    expect(res.register.token).toBeTruthy();
+    expect(res.register.errors).toBeNull();
+    expect(res.register.user.email).toEqual(REGISTER_EMAIL);
   });
   
   it("and check that the user got added to the db", async () => {
     console.log(`${ANSI_ESCAPES.blue}`, `checking that the user got added to the DB`, `${ANSI_ESCAPES.reset}`);
     const connection = await connectDb();
     const users = await User.find({ where: { email: REGISTER_EMAIL }});
-    console.log("users");
     logJson(users);
     expect(users).toHaveLength(1);
     connection.close();
@@ -48,16 +47,21 @@ describe("register first and then use the same credentials to test login mutatio
 // launch login mutation
 describe("do the login mutation", () => {
   it("login mutation", async () => {
-    const res = await request(HOST + "/graphql", LOGIN_MUTATION);
+    console.log(`${ANSI_ESCAPES.blue}`, `check the login mutation`, `${ANSI_ESCAPES.reset}`);
+    const res: LoginResponse = await request(HOST + "/graphql", LOGIN_MUTATION);
     // check the response
-    expect(res).toEqual(CORRECT_LOGIN_RESPONSE);
+    logJson(res);
+    expect(res.login.errors).toBeNull();
+    expect(res.login.user.email).toEqual(REGISTER_EMAIL);
   }); 
 });
 
 // do a me query
 describe("do a me query to check that I am logged in", () => {
   it("me query", async () => {
+    console.log(`${ANSI_ESCAPES.blue}`, `check the me query`, `${ANSI_ESCAPES.reset}`);
     const res = await request(HOST + "/graphql", ME_QUERY);
+    logJson(res);
     expect(res).toEqual(CORRECT_ME_RESPONSE);
   });
 });

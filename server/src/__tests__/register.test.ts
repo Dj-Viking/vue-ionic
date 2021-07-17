@@ -1,25 +1,24 @@
 import { request } from "graphql-request";
 import { User } from "../entities/User";
 import { 
-  CORRECT_REGISTER_ERROR,
   HOST, 
-  // CORRECT_REGISTER_ERROR, 
 } from "../constants";
 import { connectDb } from "./utils/connectDb";
 import {
   REGISTER_MUTATION, 
-  CORRECT_REGISTER_RESPONSE,
   REGISTER_EMAIL,
 } from "../../src/constants";
-import { ANSI_ESCAPES } from "../types";
+import { ANSI_ESCAPES, RegisterResponse } from "../types";
 import { logJson } from "../__tests__/utils/helpers";
 
 describe("Tests the user register", () => {
   it("get expected response from the register mutation", async () => {
     console.log(`${ANSI_ESCAPES.blue}`, `Registering a new user`, `${ANSI_ESCAPES.reset}`);
-    const res = await request(HOST + "/graphql", REGISTER_MUTATION);
+    const res: RegisterResponse = await request(HOST + "/graphql", REGISTER_MUTATION);
     logJson(res);
-    expect(res).toEqual(CORRECT_REGISTER_RESPONSE);
+    expect(res.register.token).toBeTruthy();
+    expect(res.register.errors).toBeNull();
+    expect(res.register.user.email).toEqual(REGISTER_EMAIL);
   });
   
   it("and check that the user got added to the db", async () => {
@@ -31,11 +30,11 @@ describe("Tests the user register", () => {
     connection.close();
   });
 
-  it("checks if we try to register with the same credentials it returns the correct error response", async () => {
+  it("checks if we try to register with the same credentials it returns an error", async () => {
     console.log(`${ANSI_ESCAPES.blue}`, `trying to register the same user`, `${ANSI_ESCAPES.reset}`);
-    const res = await request(HOST + "/graphql", REGISTER_MUTATION);
+    const res: RegisterResponse = await request(HOST + "/graphql", REGISTER_MUTATION);
     logJson(res);
-    expect(res).toEqual(CORRECT_REGISTER_ERROR);
+    expect(res.register.errors).toHaveLength(1);
   });
 
   it("checks if we delete the user we just made", async () => {

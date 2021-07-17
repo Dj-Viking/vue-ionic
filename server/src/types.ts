@@ -44,7 +44,10 @@ export type MyContext = {
 
 export interface RegisterResponse {
     register: {
-        errors: null,
+        errors: null | {
+            field: string,
+            message: string
+        },
         token: string
         user: {
             email: string
@@ -55,15 +58,19 @@ export interface RegisterErrorResponse {
     register: {
         errors: [
             {
-                field: string,
-                message: string
+                field: string;
+                message: string;
             }
-        ],
-        user: null
+        ];
+        user: null; 
     }
 }
 export interface LoginResponse {
     login: {
+        errors: null | {
+            field: string;
+            message: string;
+        }
         token: string
         user: {
             email: string

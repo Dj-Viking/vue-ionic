@@ -15,6 +15,7 @@ import argon2 from 'argon2';
 import { COOKIE_NAME, FORGET_PASS_PREFIX } from '../constants';
 import { sendEmail } from '../utils/sendEmail';
 import { ErrorResponse } from '../utils/createError';
+import { signToken } from '../utils/signToken';
 const uuid = require('uuid');
 
 @InputType()
@@ -66,22 +67,11 @@ class UserResponse {
   errors?: UserFieldError[] | null
 
   @Field(() => User, { nullable: true })
-  user?: User | undefined
+  user?: User | null
+  
+  @Field(() => String, { nullable: true })
+  token?: string | null
 }
-
-// @ObjectType()
-// class RegisterResponse {
-//   @Field(() => [UserFieldError], { nullable: true })
-//   errors?: UserFieldError[] | null
-
-//   @Field(() => User, { nullable: true })
-//   user?: User | undefined
-
-//   @Field(() => String)
-//   token?: String
-// }
-
-
 
 @Resolver()
 export class UserResolver {
@@ -292,13 +282,13 @@ export class UserResolver {
       //login the user after registration
       // req.session.userId = user.id;
       // req.session.username = user.username;
-      req.user = {
-        id: user.id,
-        username: user.username,
-        email: user.email
-      } as MyContext["req"]["user"]
       
+      const token = signToken(user);
+
+      req.user = token;
+      //sign a token with the user information and then return it along with the user
       return {
+        token,
         user
       };
     } catch (error) {
@@ -382,22 +372,15 @@ export class UserResolver {
   logout(
     @Ctx() {req, res}: MyContext
   ): Promise<boolean> {
-    return new Promise
-    (
-      resolve => req.session.destroy
-      (
-        error => {
-          res.clearCookie(COOKIE_NAME);
-          if (error) {
-            console.log(error);
-            resolve(false);
-            return;
-          } else {
-            resolve(true);
-          }
-        }
-      )
-    );
+    return new Promise(resolve => req.session.destroy(error => {
+      res.clearCookie(COOKIE_NAME);
+      if (error) {
+        console.log(error);
+        return resolve(false);
+      } else {
+        return resolve(true);
+      }
+    }));
   }
 
 }
