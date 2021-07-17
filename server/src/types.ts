@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { Session, SessionData } from 'express-session';
 import { Redis } from 'ioredis';
-import { JwtPayload } from 'jsonwebtoken';
 // & sign in typescript joins types together (intersection)
 // | sign in typescript gives the option for the type to be either one type or another (union)
 
@@ -18,11 +17,7 @@ export type MyContext = {
             username?: String 
         }
     } & {
-        user?: {
-            id: number,
-            username: string,
-            email: string
-        } | JwtPayload | string
+        user: JwtData | null
     }
     res: Response
     RedisClient?: Redis
@@ -84,4 +79,14 @@ export interface MeResponse {
 }
 export interface LogoutResponse {
     logout: boolean
+}
+
+export type JwtData = {
+    data: IJwtData
+}
+
+export interface IJwtData {
+    username: string;
+    id: number;
+    email: string;
 }

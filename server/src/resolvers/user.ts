@@ -12,7 +12,7 @@ import {
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import argon2 from 'argon2';
-import { COOKIE_NAME, FORGET_PASS_PREFIX } from '../constants';
+import { FORGET_PASS_PREFIX } from '../constants';
 import { sendEmail } from '../utils/sendEmail';
 import { ErrorResponse } from '../utils/createError';
 import { signToken } from '../utils/signToken';
@@ -178,14 +178,14 @@ export class UserResolver {
 
   @Query(() => User, { nullable: true } )
   async me(
-    @Ctx() { req }: MyContext
+    @Ctx() context: MyContext
   ): Promise<User | null | ErrorResponse>{
 
     try {
-      // you are not logged in
-      if (!req.session.userId) return null;
+      //check if user is logged in from the context.req.user
+      if (!context.req.user) return null;
   
-      const user = await User.findOne(req.session.userId);
+      const user = await User.findOne(context.req.user.data.id);
       if (!user) return null;
       return user;
       
@@ -204,11 +204,12 @@ export class UserResolver {
           password: "viking"
         })
         {
-          errors{
+          token
+          errors {
             field
             message
           }
-          user{
+          user {
             email
             username
             id
@@ -221,11 +222,12 @@ export class UserResolver {
     {
         register(options: $options)
         {
-          errors{
+          token
+          errors {
             field
             message
           }
-          user{
+          user {
             username
             id
             createdAt
@@ -237,7 +239,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg('options', () => RegisterInput) options: RegisterInput,
-    @Ctx() { req }: MyContext
+    @Ctx() _context: MyContext
   ): Promise<UserResponse> {
     
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -315,11 +317,12 @@ export class UserResolver {
           password: "password"
         })
         {
-          errors{
+          token
+          errors {
             field
             message
           }
-          user{
+          user {
             id
             username
           }
@@ -329,6 +332,7 @@ export class UserResolver {
     {
         login(options: $options)
         {
+          token
           errors{
             field
             message
@@ -359,28 +363,41 @@ export class UserResolver {
       return new ErrorResponse(field, message);
     }
     //login the user, and set the cookie
-    req.session.userId = user.id;
-    req.session.welcomeBackMsg = `Welcome back ${user.username}!`;
-    req.session.username = user.username;
+    // req.session.userId = user.id;
+    // req.session.welcomeBackMsg = `Welcome back ${user.username}!`;
+    // req.session.username = user.username;
+
+    const token = signToken(user);
 
     return {
+      token,
       user
     };
   }
 
   @Mutation(() => Boolean)
   logout(
-    @Ctx() {req, res}: MyContext
-  ): Promise<boolean> {
-    return new Promise(resolve => req.session.destroy(error => {
-      res.clearCookie(COOKIE_NAME);
-      if (error) {
-        console.log(error);
-        return resolve(false);
-      } else {
-        return resolve(true);
-      }
-    }));
+    @Ctx() context: MyContext
+  ): Promise<boolean> | undefined {
+    // return new Promise(resolve => req.session.destroy(error => {
+    //   res.clearCookie(COOKIE_NAME);
+    //   if (error) {
+    //     console.log(error);
+    //     return resolve(false);
+    //   } else {
+    //     return resolve(true);
+    //   }
+    // }));
+    try {
+      return new Promise(resolve => {
+        context.req.user = null;
+        resolve(true);
+      })
+    } catch (error) {
+      console.log(error);
+      return;
+      
+    }
   }
 
 }

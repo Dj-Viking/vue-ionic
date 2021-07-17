@@ -14,7 +14,7 @@ export function signToken(user: User): string {
     email: user.email
   };
 
-  return jwt.sign({ data: payload },
+  return jwt.sign(payload,
                   SECRET as string,
                   { expiresIn: EXPIRATION });
 }

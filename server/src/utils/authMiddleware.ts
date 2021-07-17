@@ -1,5 +1,5 @@
-import { ANSI_ESCAPES, MyContext } from "../types";
-import jwt from "jsonwebtoken";
+import { ANSI_ESCAPES, JwtData, MyContext } from "../types";
+import jwt, { JwtPayload } from "jsonwebtoken";
 require('dotenv').config();
 const secret: string | undefined = process.env.SECRET;
 const expiration: string | undefined = process.env.EXPIRATION;
@@ -7,7 +7,8 @@ const expiration: string | undefined = process.env.EXPIRATION;
 
 export function authMiddleware(
   context: MyContext
-): MyContext["req"] {
+): MyContext {
+  
   try {
     // allows token to be sent via req.body, req.query, or headers
     let token = context.req.headers.authorization;
@@ -22,17 +23,19 @@ export function authMiddleware(
 
     console.log(ANSI_ESCAPES.yellow, `token recieved ${token}`, ANSI_ESCAPES.reset);
     if (!token) {
-      return context.req;
+      return context;
     }
 
-    const jwtPayload = jwt.verify(token as string,
-      secret as string,
-      { maxAge: expiration }); //maxage deprecated but still accepted...
-    context.req.user = jwtPayload;
+    const jwtPayload: JwtPayload | string = jwt.verify(token as string,
+                                                  secret as string,
+                                                  { maxAge: expiration }); //maxage deprecated but still accepted...
+    console.log('payload', jwtPayload);
+    
+    context.req.user = <JwtData>jwtPayload;
   } catch {
     console.log('Invalid token');
-    return context.req;
+    return context
   }
 
-  return context.req;
+  return context;
 }
