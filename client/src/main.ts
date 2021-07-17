@@ -33,13 +33,17 @@ import AuthService from "./utils/authService";
 
 // Cache implementation
 const cache = new InMemoryCache()
-const token = await AuthService.getToken();
+
+let token; 
+(async function(){
+  token = await AuthService.getToken();
+})()
 // HTTP connection to the API
 const httpLink = createHttpLink({
   // You should use an absolute URL here
   uri: process.env.NODE_ENV === "development" ? "http://localhost:4000/graphql" : "/graphql",
   headers: {
-    authorization: `Bearer ${!!token ? token : null}`
+    authorization: `Bearer ${token ? token : null}`
   },
   credentials: "include"
 });

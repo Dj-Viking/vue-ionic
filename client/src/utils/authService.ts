@@ -9,12 +9,10 @@ class AuthService {
   }
 
   async loggedIn(): Promise<boolean> {
-    return new Promise(async (resolve) => {
-      // Checks if there is a saved token and it's still valid
-      const token = await this.getToken();
-      //is token a truthy value and token is not expired
-      return resolve(!!token && !this.isTokenExpired(token));
-    });
+    // Checks if there is a saved token and it's still valid
+    const token = await this.getToken();
+    //is token a truthy value and token is not expired
+    return !!token && !this.isTokenExpired(token);
   }
 
   isTokenExpired(token: string): boolean {
@@ -33,7 +31,7 @@ class AuthService {
     // Retrieves the user token from localStorage
     return new Promise((resolve) => {
       const token = localStorage.getItem('id_token');
-      !!token ? resolve(token) : resolve(false);
+      token ? resolve(token) : resolve(false);
     })
   }
 
@@ -46,13 +44,10 @@ class AuthService {
   }
 
   async clearToken(): Promise<void> {
-    return new Promise(async (resolve) => {
       const token = await this.getToken();
-      if (!!token) {
+      if (token) {
         localStorage.removeItem('id_token');
-        resolve()
       } else return;
-    });
   }
 }
 
