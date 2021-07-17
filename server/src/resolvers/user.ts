@@ -195,6 +195,7 @@ export class UserResolver {
   }
 
   /**
+   * register example
    *  @example
     mutation 
     {
@@ -287,6 +288,8 @@ export class UserResolver {
       
       const token = signToken(user);
 
+      // await User.update()
+
       // req.user = token;
       //sign a token with the user information and then return it along with the user
       return {
@@ -309,6 +312,7 @@ export class UserResolver {
 
 
   /**
+   * login example
    * @example
     mutation
     {
@@ -390,6 +394,7 @@ export class UserResolver {
     // }));
     try {
       return new Promise(resolve => {
+        //remove token from user table?
         context.req.user = null;
         resolve(true);
       })
