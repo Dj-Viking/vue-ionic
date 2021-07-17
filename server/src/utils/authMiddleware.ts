@@ -27,15 +27,15 @@ export function authMiddleware(
     }
 
     const jwtPayload: JwtPayload | string = jwt.verify(token as string,
-                                                  secret as string,
-                                                  { maxAge: expiration }); //maxage deprecated but still accepted...
+                                                       secret as string,
+                                                       { maxAge: expiration }); //maxage deprecated but still accepted...
     // console.log('payload', jwtPayload);
     
     context.req.user = <JwtData>jwtPayload;
+    return context;
   } catch (error) {
     console.log(error);
     return context
   }
 
-  return context;
 }
