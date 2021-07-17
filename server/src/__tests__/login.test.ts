@@ -74,12 +74,14 @@ describe("do the logout mutation", () => {
   });
 });
 
-
-//delete the user
-it("checks if we delete the user we just made", async () => {
-  const connection = await connectDb();
-  await User.delete({ email: REGISTER_EMAIL });
-  const users = await User.find({ where: { email: REGISTER_EMAIL } });
-  expect(users).toHaveLength(0);
-  connection.close();
-}); 
+describe("delete the user we just made", () => {
+  //delete the user
+  it("checks if we delete the user we just made", async () => {
+    console.log(`${ANSI_ESCAPES.blue}`, `checks the delete action`, `${ANSI_ESCAPES.reset}`);
+    const connection = await connectDb();
+    await User.delete({ email: REGISTER_EMAIL });
+    const users = await User.find({ where: { email: REGISTER_EMAIL } });
+    expect(users).toHaveLength(0);
+    connection.close();
+  }); 
+})

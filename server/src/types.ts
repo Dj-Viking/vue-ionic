@@ -25,7 +25,7 @@ export type MyContext = {
         } | JwtPayload | string
     }
     res: Response
-    RedisClient: Redis
+    RedisClient?: Redis
 }
 
 /**

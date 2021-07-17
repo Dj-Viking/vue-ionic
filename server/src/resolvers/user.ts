@@ -96,7 +96,7 @@ export class UserResolver {
       const token = uuid.v4();
   
       //set the token with ioredis
-      await RedisClient.set(
+      await RedisClient?.set(
         FORGET_PASS_PREFIX + token, //key
         user.id, //value type
         'ex', 
@@ -134,7 +134,7 @@ export class UserResolver {
       }
   
       const key = FORGET_PASS_PREFIX + token;
-      const userId = await RedisClient.get(key)
+      const userId = await RedisClient?.get(key)
       if (!userId) 
       {
         const field = "token";
@@ -160,7 +160,7 @@ export class UserResolver {
       //delete the key so we can't change
       // the password again because the token
       // will be forcibly expired
-      await RedisClient.del(key)
+      await RedisClient?.del(key)
 
       //log in user after password change
       req.session.userId = user.id;
@@ -285,7 +285,7 @@ export class UserResolver {
       
       const token = signToken(user);
 
-      req.user = token;
+      // req.user = token;
       //sign a token with the user information and then return it along with the user
       return {
         token,

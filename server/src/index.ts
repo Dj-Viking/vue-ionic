@@ -2,9 +2,7 @@ require('dotenv').config();
 import path from "path";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-// import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 import express from "express";
-// import { graphqlHTTP } from "express-graphql";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
@@ -14,12 +12,12 @@ import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { User } from "./entities/User";
 import { UserResolver } from './resolvers/user';
-import { MyContext, ANSI_ESCAPES } from "./types";
+import { ANSI_ESCAPES } from "./types";
 import { GraphQLSchema } from "graphql";
+import { authMiddleware } from "./utils/authMiddleware";
 const {
   DB_NAME,
   DB_USER,
-  // DB_TYPE,
   DB_PASSWORD,
   SECRET,
   CORS_ALLOWED
@@ -29,14 +27,13 @@ export const startServer = async (): Promise<void> => {
   console.log("hello world!!!!");
   //start postgres db connection
 
-  //heroku settings???
   await createConnection({
     type: "postgres",
     url: IS_PROD ? process.env.DATABASE_URL : undefined,
     database: !IS_PROD ? DB_NAME : undefined,
     password: !IS_PROD ? DB_PASSWORD : undefined,
     username: !IS_PROD ? DB_USER : undefined,
-    logging: true, //dont log if we are in prod
+    logging: true,
     synchronize: true,
     ssl: IS_PROD,
     extra: IS_PROD && {
@@ -94,10 +91,8 @@ export const startServer = async (): Promise<void> => {
     saveUninitialized: false
   }));
 
-  apolloServer = new ApolloServer({
-    schema: MyGraphQLSchema,
-    context: ({ req, res }): MyContext => ({ req, res, RedisClient })
-  });
+  apolloServer = new ApolloServer({ schema: MyGraphQLSchema,
+                                    context: authMiddleware });
 
   apolloServer.applyMiddleware({
     app,
@@ -106,16 +101,6 @@ export const startServer = async (): Promise<void> => {
       credentials: true
     },
   });
-
-  // app.use('/graphql', (req, res) => {
-  // 	console.log('request object in the /graphql request', req);
-
-  // 	return graphqlHTTP({
-  // 		schema: MyGraphQLSchema,
-  // 		graphiql: !IS_PROD, // or whatever you want
-  // 		context: { req, res },
-  // 	})(req, res);
-  // });
 
   //EXPRESS MIDDLEWARE FUNCTIONS
   app.use(express.urlencoded({
@@ -131,10 +116,11 @@ export const startServer = async (): Promise<void> => {
       path.join(__dirname, '../../client/dist')
     ));
     // IF TRAVELS ANY ROUTE OUTSIDE VUE'S CURRENT PAGE REDIRECT TO ROOT
-    app.get('*', (_req, res) => {
+    app.get('*', (_req, res, next) => {
       res.sendFile(path.join(
         __dirname, '../client/dist/index.html'
       ));
+      next();
     });
     //REDIRECT HTTP TRAFFIC TO HTTPS
     app.use((req, res, next) => {
