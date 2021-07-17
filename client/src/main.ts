@@ -29,14 +29,18 @@ import "./theme/core.css";
 //apollo stuff
 import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client/core";
 import { DefaultApolloClient } from "@vue/apollo-composable";
+import AuthService from "./utils/authService";
 
 // Cache implementation
 const cache = new InMemoryCache()
+const token = await AuthService.getToken();
 // HTTP connection to the API
 const httpLink = createHttpLink({
   // You should use an absolute URL here
   uri: process.env.NODE_ENV === "development" ? "http://localhost:4000/graphql" : "/graphql",
-  headers: {},
+  headers: {
+    authorization: `Bearer ${!!token ? token : null}`
+  },
   credentials: "include"
 });
 
@@ -44,7 +48,6 @@ const httpLink = createHttpLink({
 const apolloClient = new ApolloClient({
   link: httpLink,
   cache,
-  credentials: "include",
 });
 const app = createApp({
   setup() {

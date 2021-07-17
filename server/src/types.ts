@@ -81,9 +81,7 @@ export interface LogoutResponse {
     logout: boolean
 }
 
-export type JwtData = {
-    data: IJwtData
-}
+export type JwtData = IJwtData;
 
 export interface IJwtData {
     username: string;

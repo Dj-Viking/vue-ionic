@@ -180,12 +180,15 @@ export class UserResolver {
   async me(
     @Ctx() context: MyContext
   ): Promise<User | null | ErrorResponse>{
-
+    // the context is the token with the user information that is verified with each request
+    // that has the token in the authorization header 
     try {
       //check if user is logged in from the context.req.user
       if (!context.req.user) return null;
   
-      const user = await User.findOne(context.req.user.data.id);
+      const user = await User.findOne({where: { email: context.req.user.email }});
+      console.log('found user', user);
+      
       if (!user) return null;
       return user;
       
@@ -240,7 +243,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg('options', () => RegisterInput) options: RegisterInput,
-    @Ctx() _context: MyContext
+    @Ctx() context: MyContext
   ): Promise<UserResponse> {
     
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -264,14 +267,24 @@ export class UserResolver {
         const message = "password length too short must be greater than 3 characters";
         return new ErrorResponse(field, message);
       }
-  
+
+      
       const hashedPassword = await argon2.hash(options.password);
-      let user;
+
+      let tempUser = {
+        username: options.username,
+        email: options.email,
+        password: hashedPassword
+      };
+      const token = signToken(tempUser);
+
+      let user: User;
       const result = await getConnection().createQueryBuilder().insert().into(User).values(
         {
           username: options.username,
           email: options.email,
-          password: hashedPassword
+          password: hashedPassword,
+          token: token
         }
       )
       .returning('*')
@@ -280,15 +293,19 @@ export class UserResolver {
       // i guess I could insert as many objects into the table and will
       // return more created objects into the raw array
       user = result.raw[0];
+      console.log(user);
+      
+      context.req.user = {
+        id: user.id,
+        email: user.email,
+        username: user.username
+      }
 
       //cookie method....not working in production for some reason....sets cookie locally but not in prod...frustrating
       //login the user after registration
       // req.session.userId = user.id;
       // req.session.username = user.username;
-      
-      const token = signToken(user);
 
-      // await User.update()
 
       // req.user = token;
       //sign a token with the user information and then return it along with the user
@@ -349,8 +366,7 @@ export class UserResolver {
    */
   @Mutation(() => UserResponse)
   async login(
-    @Arg('options', () => LoginInput) options: LoginInput,
-    @Ctx() { req }: MyContext
+    @Arg('options', () => LoginInput) options: LoginInput
   ): Promise<UserResponse>{
     const user = await User.findOne({ where: { email: options.email } });
     if (!user) 

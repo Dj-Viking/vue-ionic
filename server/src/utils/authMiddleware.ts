@@ -21,7 +21,7 @@ export function authMiddleware(
       token = token?.split(' ')?.pop()?.trim();
     }
 
-    console.log(ANSI_ESCAPES.yellow, `token recieved ${token}`, ANSI_ESCAPES.reset);
+    // console.log(ANSI_ESCAPES.yellow, `token recieved ${token}`, ANSI_ESCAPES.reset);
     if (!token) {
       return context;
     }
@@ -29,11 +29,11 @@ export function authMiddleware(
     const jwtPayload: JwtPayload | string = jwt.verify(token as string,
                                                   secret as string,
                                                   { maxAge: expiration }); //maxage deprecated but still accepted...
-    console.log('payload', jwtPayload);
+    // console.log('payload', jwtPayload);
     
     context.req.user = <JwtData>jwtPayload;
-  } catch {
-    console.log('Invalid token');
+  } catch (error) {
+    console.log(error);
     return context
   }
 

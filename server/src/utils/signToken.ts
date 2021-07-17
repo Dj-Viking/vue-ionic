@@ -1,4 +1,3 @@
-import { User } from "src/entities/User";
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 
@@ -7,11 +6,11 @@ const {
   EXPIRATION
 } = process.env;
 
-export function signToken(user: User): string {
+export function signToken(user: { username: string, email: string, password: string }): string {
   const payload = {
     username: user.username,
-    id: user.id,
-    email: user.email
+    email: user.email,
+    password: user.password
   };
 
   return jwt.sign(payload,

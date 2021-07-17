@@ -13,9 +13,12 @@ import { logJson } from "../__tests__/utils/helpers";
 
 describe("Tests the user register", () => {
   it("get expected response from the register mutation", async () => {
+    console.log("a;lskdflkajsflaskjdflasjkflsadkjflaskjflasdkjflk");
+    
     console.log(`${ANSI_ESCAPES.blue}`, `Registering a new user`, `${ANSI_ESCAPES.reset}`);
     const res: RegisterResponse = await request(HOST + "/graphql", REGISTER_MUTATION);
-    logJson(res);
+    console.log('user', logJson(res));
+    
     expect(res.register.token).toBeTruthy();
     expect(res.register.errors).toBeNull();
     expect(res.register.user.email).toEqual(REGISTER_EMAIL);

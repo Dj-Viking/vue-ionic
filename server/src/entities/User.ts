@@ -42,7 +42,8 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Field()
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
   token?: string
 
 }
