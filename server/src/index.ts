@@ -17,158 +17,158 @@ import { UserResolver } from './resolvers/user';
 import { MyContext, ANSI_ESCAPES } from "./types";
 import { GraphQLSchema } from "graphql";
 const {
-	DB_NAME,
-	DB_USER,
-	// DB_TYPE,
-	DB_PASSWORD,
-	SECRET,
-	CORS_ALLOWED
+  DB_NAME,
+  DB_USER,
+  // DB_TYPE,
+  DB_PASSWORD,
+  SECRET,
+  CORS_ALLOWED
 } = process.env;
 
 export const startServer = async (): Promise<void> => {
-	console.log("hello world!!!!");
-	//start postgres db connection
+  console.log("hello world!!!!");
+  //start postgres db connection
 
-	//heroku settings???
-	await createConnection({
-		type: "postgres",
-		url: IS_PROD ? process.env.DATABASE_URL : undefined,
-		database: !IS_PROD ? DB_NAME: undefined,
-		password: !IS_PROD ? DB_PASSWORD: undefined,
-		username: !IS_PROD ? DB_USER : undefined,
-		logging: true, //dont log if we are in prod
-		synchronize: true,
-		ssl: IS_PROD,
-		extra: IS_PROD && {
-			ssl: {
-				rejectUnauthorized: false,
-			},
-		},
-		entities: [User]
-	});
+  //heroku settings???
+  await createConnection({
+    type: "postgres",
+    url: IS_PROD ? process.env.DATABASE_URL : undefined,
+    database: !IS_PROD ? DB_NAME : undefined,
+    password: !IS_PROD ? DB_PASSWORD : undefined,
+    username: !IS_PROD ? DB_USER : undefined,
+    logging: true, //dont log if we are in prod
+    synchronize: true,
+    ssl: IS_PROD,
+    extra: IS_PROD && {
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
+    entities: [User]
+  });
 
-	//setup express
-	const app = express();
-	const RedisStore = connectRedis(session);
+  //setup express
+  const app = express();
+  const RedisStore = connectRedis(session);
 
-	let RedisClient: Redis.Redis;
-	let apolloServer: ApolloServer;
-	let MyGraphQLSchema: GraphQLSchema;
+  let RedisClient: Redis.Redis;
+  let apolloServer: ApolloServer;
+  let MyGraphQLSchema: GraphQLSchema;
 
-	RedisClient = new Redis(process.env.REDIS_TLS_URL || undefined, {
-		db: IS_PROD ? 0: undefined,
-		tls: IS_PROD ? {
-			rejectUnauthorized: !IS_PROD,
-			requestCert: IS_PROD,
-		} : undefined
-	} || undefined);
+  RedisClient = new Redis(process.env.REDIS_TLS_URL || undefined, {
+    db: IS_PROD ? 0 : undefined,
+    tls: IS_PROD ? {
+      rejectUnauthorized: !IS_PROD,
+      requestCert: IS_PROD,
+    } : undefined
+  } || undefined);
 
-	MyGraphQLSchema = await buildSchema({
-		resolvers: [UserResolver],
-		validate: false
-	});
+  MyGraphQLSchema = await buildSchema({
+    resolvers: [UserResolver],
+    validate: false
+  });
 
-	app.use(cors({
-		origin: new RegExp(CORS_ALLOWED as string),
-		credentials: true
-	}));
+  app.use(cors({
+    origin: new RegExp(CORS_ALLOWED as string),
+    credentials: true
+  }));
 
-	//redis middleware for auth 
-	app.use(session({
-		name: COOKIE_NAME,
-		store: new RedisStore({
-			client: RedisClient,
-			disableTouch: false,
-			ttl: 86400,
-			host: !IS_PROD ? "localhost" : undefined,
-			port: !IS_PROD ? 6739 : undefined
-		}),
-		cookie: {
-			maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-			httpOnly: !IS_PROD as boolean, // if true cookie works in http
-			sameSite: "none", //protecting csrf
-			secure: IS_PROD as boolean //cookie only works in https
-		},
-		secret: SECRET as string,
-		resave: false,
-		saveUninitialized: false
-	}));
+  //redis middleware for auth 
+  app.use(session({
+    name: COOKIE_NAME,
+    store: new RedisStore({
+      client: RedisClient,
+      disableTouch: false,
+      ttl: 86400,
+      host: !IS_PROD ? "localhost" : undefined,
+      port: !IS_PROD ? 6739 : undefined
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+      httpOnly: !IS_PROD as boolean, // if true cookie works in http
+      sameSite: "none", //protecting csrf
+      secure: IS_PROD as boolean //cookie only works in https
+    },
+    secret: SECRET as string,
+    resave: false,
+    saveUninitialized: false
+  }));
 
-	apolloServer = new ApolloServer({
-		schema: MyGraphQLSchema,
-		context: ({ req, res }): MyContext => ({ req, res, RedisClient })
-	});
+  apolloServer = new ApolloServer({
+    schema: MyGraphQLSchema,
+    context: ({ req, res }): MyContext => ({ req, res, RedisClient })
+  });
 
-	apolloServer.applyMiddleware({
-		app,
-		cors: {
-			origin: new RegExp(CORS_ALLOWED as string),
-			credentials: true
-		},
-	});
+  apolloServer.applyMiddleware({
+    app,
+    cors: {
+      origin: new RegExp(CORS_ALLOWED as string),
+      credentials: true
+    },
+  });
 
-	// app.use('/graphql', (req, res) => {
-	// 	console.log('request object in the /graphql request', req);
-		
-	// 	return graphqlHTTP({
-	// 		schema: MyGraphQLSchema,
-	// 		graphiql: !IS_PROD, // or whatever you want
-	// 		context: { req, res },
-	// 	})(req, res);
-	// });
+  // app.use('/graphql', (req, res) => {
+  // 	console.log('request object in the /graphql request', req);
 
-	//EXPRESS MIDDLEWARE FUNCTIONS
-	app.use(express.urlencoded({
-		extended: false
-	}));
-	app.use(express.json());
-	//STATIC PUBLIC FRONT END ASSETS WHILE IN DEVELOPMENT
+  // 	return graphqlHTTP({
+  // 		schema: MyGraphQLSchema,
+  // 		graphiql: !IS_PROD, // or whatever you want
+  // 		context: { req, res },
+  // 	})(req, res);
+  // });
 
-	//IF-ENV IN DEPLOYMENT
-	if (process.env.NODE_ENV === 'production') {
-		//STATIC ASSETS FROM VUE BUILD FOLDER
-		app.use(express.static(
-			path.join(__dirname, '../../client/dist')
-		));
-		// IF TRAVELS ANY ROUTE OUTSIDE VUE'S CURRENT PAGE REDIRECT TO ROOT
-		app.get('*', (_req, res) => {
-			res.sendFile(path.join(
-				__dirname, '../client/dist/index.html'
-			));
-		});
-		//REDIRECT HTTP TRAFFIC TO HTTPS
-		app.use((req, res, next) => {
-			if (req.header('x-forwarded-proto') !== 'https') res.redirect(`https://${req.header('host')}${req.url}`);
-			next();
-		});
-	}
+  //EXPRESS MIDDLEWARE FUNCTIONS
+  app.use(express.urlencoded({
+    extended: false
+  }));
+  app.use(express.json());
+  //STATIC PUBLIC FRONT END ASSETS WHILE IN DEVELOPMENT
 
-	app.use('/', (_, res) => {
-		res.status(200).sendFile(path.join(
-			__dirname, '../client/dist/index.html'
-		));
-	});
+  //IF-ENV IN DEPLOYMENT
+  if (process.env.NODE_ENV === 'production') {
+    //STATIC ASSETS FROM VUE BUILD FOLDER
+    app.use(express.static(
+      path.join(__dirname, '../../client/dist')
+    ));
+    // IF TRAVELS ANY ROUTE OUTSIDE VUE'S CURRENT PAGE REDIRECT TO ROOT
+    app.get('*', (_req, res) => {
+      res.sendFile(path.join(
+        __dirname, '../client/dist/index.html'
+      ));
+    });
+    //REDIRECT HTTP TRAFFIC TO HTTPS
+    app.use((req, res, next) => {
+      if (req.header('x-forwarded-proto') !== 'https') res.redirect(`https://${req.header('host')}${req.url}`);
+      next();
+    });
+  }
 
-	const PORT = process.env.PORT || 4000;
-	app.listen(PORT, () => {
-		console.log(
-			ANSI_ESCAPES.yellow,
-			`server started on ${PORT}`,
-			ANSI_ESCAPES.reset
-		);
-		console.log(
-			ANSI_ESCAPES.purple,
-			`graphql started? ${apolloServer.graphqlPath}`,
-			ANSI_ESCAPES.reset
-		);
+  app.use('/', (_, res) => {
+    res.status(200).sendFile(path.join(
+      __dirname, '../client/dist/index.html'
+    ));
+  });
 
-	});
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(
+      ANSI_ESCAPES.yellow,
+      `server started on ${PORT}`,
+      ANSI_ESCAPES.reset
+    );
+    console.log(
+      ANSI_ESCAPES.purple,
+      `graphql started? ${apolloServer.graphqlPath}`,
+      ANSI_ESCAPES.reset
+    );
+
+  });
 
 
 }
 startServer().catch((e: Error) => console.log(ANSI_ESCAPES.red,
-											  											`error while server started ` + e.name + ' ' + e.stack,
-											  											ANSI_ESCAPES.reset));
+  `error while server started ` + e.name + ' ' + e.stack,
+  ANSI_ESCAPES.reset));
 /** graph ql settings
  * {
   "editor.cursorShape": "line",
