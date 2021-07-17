@@ -3,11 +3,11 @@ import path from "path";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
 import express from "express";
-import session from "express-session";
-import connectRedis from "connect-redis";
-import Redis from "ioredis";
+// import session from "express-session";
+// import connectRedis from "connect-redis";
+// import Redis from "ioredis";
 import cors from "cors";
-import { COOKIE_NAME, IS_PROD } from "./constants";
+import { IS_PROD } from "./constants";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { User } from "./entities/User";
@@ -19,7 +19,6 @@ const {
   DB_NAME,
   DB_USER,
   DB_PASSWORD,
-  SECRET,
   CORS_ALLOWED
 } = process.env;
 
@@ -46,19 +45,19 @@ export const startServer = async (): Promise<void> => {
 
   //setup express
   const app = express();
-  const RedisStore = connectRedis(session);
+  // const RedisStore = connectRedis(session);
 
-  let RedisClient: Redis.Redis;
+  // let RedisClient: Redis.Redis;
   let apolloServer: ApolloServer;
   let MyGraphQLSchema: GraphQLSchema;
 
-  RedisClient = new Redis(process.env.REDIS_TLS_URL || undefined, {
-    db: IS_PROD ? 0 : undefined,
-    tls: IS_PROD ? {
-      rejectUnauthorized: !IS_PROD,
-      requestCert: IS_PROD,
-    } : undefined
-  } || undefined);
+  // RedisClient = new Redis(process.env.REDIS_TLS_URL || undefined, {
+  //   db: IS_PROD ? 0 : undefined,
+  //   tls: IS_PROD ? {
+  //     rejectUnauthorized: !IS_PROD,
+  //     requestCert: IS_PROD,
+  //   } : undefined
+  // } || undefined);
 
   MyGraphQLSchema = await buildSchema({
     resolvers: [UserResolver],
@@ -71,25 +70,25 @@ export const startServer = async (): Promise<void> => {
   }));
 
   //redis middleware for auth 
-  app.use(session({
-    name: COOKIE_NAME,
-    store: new RedisStore({
-      client: RedisClient,
-      disableTouch: false,
-      ttl: 86400,
-      host: !IS_PROD ? "localhost" : undefined,
-      port: !IS_PROD ? 6739 : undefined
-    }),
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-      httpOnly: !IS_PROD as boolean, // if true cookie works in http
-      sameSite: "none", //protecting csrf
-      secure: IS_PROD as boolean //cookie only works in https
-    },
-    secret: SECRET as string,
-    resave: false,
-    saveUninitialized: false
-  }));
+  // app.use(session({
+  //   name: COOKIE_NAME,
+  //   store: new RedisStore({
+  //     client: RedisClient,
+  //     disableTouch: false,
+  //     ttl: 86400,
+  //     host: !IS_PROD ? "localhost" : undefined,
+  //     port: !IS_PROD ? 6739 : undefined
+  //   }),
+  //   cookie: {
+  //     maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+  //     httpOnly: !IS_PROD as boolean, // if true cookie works in http
+  //     sameSite: "none", //protecting csrf
+  //     secure: IS_PROD as boolean //cookie only works in https
+  //   },
+  //   secret: SECRET as string,
+  //   resave: false,
+  //   saveUninitialized: false
+  // }));
 
   apolloServer = new ApolloServer({ schema: MyGraphQLSchema,
                                     context: authMiddleware });

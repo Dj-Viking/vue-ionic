@@ -1,4 +1,4 @@
-import { ANSI_ESCAPES, JwtData, MyContext } from "../types";
+import { JwtData, MyContext } from "../types";
 import jwt, { JwtPayload } from "jsonwebtoken";
 require('dotenv').config();
 const secret: string | undefined = process.env.SECRET;
