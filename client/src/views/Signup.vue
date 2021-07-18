@@ -93,6 +93,13 @@ import { mapActions, mapGetters } from 'vuex';
  * @see https://v4.apollo.vuejs.org/guide-composable/mutation.html#ondone
  */
 export default defineComponent({
+  components: {
+    BaseLayout,
+    IonLabel, 
+    IonInput, 
+    IonButton,
+    Spinner
+  },
   setup() {
     const email = ref("");
     const username = ref("");
@@ -105,17 +112,15 @@ export default defineComponent({
       loading: registerIsLoading, 
       error: registerError, 
       onDone: onRegisterDone 
-    } = useMutation(
-      gql`${createRegisterMutation()}`, {
-        variables: {
-          options: {
-            email: email.value,
-            username: username.value,
-            password: password.value
-          }
+    } = useMutation(gql`${createRegisterMutation()}`, {
+      variables: {
+        options: {
+          email: email.value,
+          username: username.value,
+          password: password.value
         }
       }
-    );
+    });
     onRegisterDone(result => {
       res.value = result.data;
       submitted.value = false;
@@ -129,13 +134,6 @@ export default defineComponent({
     onMounted(initFields);
 
     return { submitRegister, email, username, password, registerIsLoading, registerError, res, submitted };
-  },
-  components: {
-    BaseLayout,
-    IonLabel, 
-    IonInput, 
-    IonButton,
-    Spinner
   },
   data() { 
     return {

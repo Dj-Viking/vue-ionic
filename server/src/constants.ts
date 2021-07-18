@@ -15,6 +15,7 @@ export const HOST: string | undefined = TEST_HOST;
 export const REGISTER_EMAIL: string | undefined = TEST_EMAIL;
 export const REGISTER_USERNAME: string | undefined = TEST_USER;
 export const REGISTER_PASSWORD: string | undefined = TEST_PASS;
+export const UPDATED_USERNAME: string = `newUsername${Date.now()}`;
 
 /**
  * query to check that when i log in that i can get my information from the db while logged in
