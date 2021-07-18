@@ -1,11 +1,11 @@
 require("dotenv").config();
-import { LogoutResponse, MeResponse } from "./types";
+import { MeResponse } from "./types";
 
 const {
   TEST_EMAIL,
   TEST_HOST,
   TEST_PASS,
-  TEST_USER
+  TEST_USERNAME
 } = process.env;
 
 export const COOKIE_NAME: string = "sid";
@@ -13,7 +13,7 @@ export const IS_PROD: boolean | undefined = process.env.NODE_ENV === "production
 export const FORGET_PASS_PREFIX: string = "forget-password:";
 export const HOST: string | undefined = TEST_HOST;
 export const REGISTER_EMAIL: string | undefined = TEST_EMAIL;
-export const REGISTER_USERNAME: string | undefined = TEST_USER;
+export const REGISTER_USERNAME: string | undefined = TEST_USERNAME;
 export const REGISTER_PASSWORD: string | undefined = TEST_PASS;
 export const UPDATED_USERNAME: string = `newUsername${Date.now()}`;
 
@@ -27,13 +27,6 @@ export const ME_QUERY: string = `
     }
   }
 `;
-
-/**
- * expect logout response to be true if it worked
- */
-export const CORRECT_LOGOUT_RESPONSE: LogoutResponse = {
-  logout: true
-};
 /**
  * expect to get whatever user data we want from the query for now just email on this constant
  */
@@ -69,7 +62,17 @@ mutation register {
  */
 export const LOGOUT_MUTATION: string = `
 mutation logout {
-  logout
+  logout(email: "${REGISTER_EMAIL}"){
+    errors{
+      field
+      message
+    }
+    user {
+      username
+      email
+      token
+    }
+  }
 }`;
 /**
  * string literal of the graphql mutation for the login action

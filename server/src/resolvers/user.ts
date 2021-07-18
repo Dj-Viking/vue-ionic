@@ -395,38 +395,34 @@ export class UserResolver {
     };
   }
 
-  @Mutation(() => User)
-  logout(
+  @Mutation(() => UserResponse)
+  async logout(
     @Arg("email", () => String) email: string,
     @Ctx() context: MyContext
-  ): Promise<User> | Error {
-    // return new Promise(resolve => req.session.destroy(error => {
-    //   res.clearCookie(COOKIE_NAME);
-    //   if (error) {
-    //     console.log(error);
-    //     return resolve(false);
-    //   } else {
-    //     return resolve(true);
-    //   }
-    // }));
+  ): Promise<UserResponse> {
+    console.log('context user', context.req.user);
     try {
-      return new Promise( async (resolve) => {
-        //remove token from user table?
-        const changedUser = await getConnection().getRepository(User).createQueryBuilder("user").update<User>(User, { 
-          token: ""
-        })
-        .where("email = :email", { email: email })
-        .returning(['id', 'username', 'token', 'email', 'updatedAt', 'createdAt'])
-        .updateEntity(true)
-        .execute();
-        context.req.user = null;
-        console.log(changedUser.raw[0]);
-        
-        resolve(changedUser.raw[0]);
+      //remove token from user table?
+      const changedUser = await getConnection().getRepository(User).createQueryBuilder("user").update<User>(User, { 
+        token: ""
       })
+      .where("email = :email", { email: email })
+      .returning(['username', 'token', 'email'])
+      .updateEntity(true)
+      .execute();
+      if (!changedUser) return new ErrorResponse("user", "user not found");
+      // context.req.user = null;
+      console.log('changed user', changedUser.raw[0]);
+      
+      return {
+        user: changedUser.raw[0]
+      }
+
     } catch (error) {
       console.log(error);
-      return error;
+      const field = "error";
+      const msg = `error in the logout mutation ${error}`
+      return new ErrorResponse(field, msg);
       
     }
   }

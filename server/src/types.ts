@@ -62,10 +62,10 @@ export interface RegisterErrorResponse {
 }
 export interface LoginResponse {
     login: {
-        errors: null | {
+        errors: null | [{
             field: string;
             message: string;
-        }
+        }]
         token: string
         user: {
             email: string
@@ -78,7 +78,17 @@ export interface MeResponse {
     }
 }
 export interface LogoutResponse {
-    logout: boolean
+    logout: {
+        errors: [{
+            field: string
+            message: string
+        }] | null
+        user: {
+            username: string,
+            email: string,
+            token: string
+        } | null
+    }
 }
 
 export type JwtData = IJwtData;
