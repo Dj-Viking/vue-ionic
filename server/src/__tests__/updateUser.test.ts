@@ -33,7 +33,7 @@ describe("check user was added", () => {
     console.log(`${ANSI_ESCAPES.blue}`, `checking that the user got added to the DB`, `${ANSI_ESCAPES.reset}`);
     const connection = await connectDb();
     const users = await User.find({ where: { email: REGISTER_EMAIL }});
-    logJson(users);
+    console.log('users set', logJson(users));
     expect(users).toHaveLength(1);
     await connection.close();
   });

@@ -35,9 +35,7 @@ import AuthService from "./utils/authService";
 const cache = new InMemoryCache()
 
 let token; 
-(async function(){
-  token = await AuthService.getToken();
-})()
+(async() => token = await AuthService.getToken())()
 // HTTP connection to the API
 const httpLink = createHttpLink({
   // You should use an absolute URL here

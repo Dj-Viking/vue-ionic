@@ -395,10 +395,11 @@ export class UserResolver {
     };
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => User)
   logout(
+    @Arg("email", () => String) email: string,
     @Ctx() context: MyContext
-  ): Promise<boolean> | undefined {
+  ): Promise<User> | Error {
     // return new Promise(resolve => req.session.destroy(error => {
     //   res.clearCookie(COOKIE_NAME);
     //   if (error) {
@@ -409,14 +410,23 @@ export class UserResolver {
     //   }
     // }));
     try {
-      return new Promise(resolve => {
+      return new Promise( async (resolve) => {
         //remove token from user table?
+        const changedUser = await getConnection().getRepository(User).createQueryBuilder("user").update<User>(User, { 
+          token: ""
+        })
+        .where("email = :email", { email: email })
+        .returning(['id', 'username', 'token', 'email', 'updatedAt', 'createdAt'])
+        .updateEntity(true)
+        .execute();
         context.req.user = null;
-        resolve(true);
+        console.log(changedUser.raw[0]);
+        
+        resolve(changedUser.raw[0]);
       })
     } catch (error) {
       console.log(error);
-      return;
+      return error;
       
     }
   }
