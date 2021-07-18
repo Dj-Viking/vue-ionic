@@ -29,6 +29,7 @@ export interface RegisterArgs {
  */
 export interface RegisterResponse {
 	register: {
+		token: string;
 		errors: null
 		| [{
 			field: string;
@@ -52,6 +53,7 @@ export interface LoginArgs {
  */
 export interface LoginResponse {
 	login: {
+		token: string;
 		errors: null
 		| [{
 			field: string;

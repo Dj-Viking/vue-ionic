@@ -87,6 +87,7 @@ import {
   // RegisterArgs, 
   RegisterResponse 
 } from "../types";
+import { mapActions, mapGetters } from 'vuex';
 /**
  * for more help with vue3 composition api and vue apollo check out 
  * @see https://v4.apollo.vuejs.org/guide-composable/mutation.html#ondone
@@ -144,6 +145,9 @@ export default defineComponent({
       showSpinner: false
     }
   },
+  computed: {
+    ...mapGetters(["user"])
+  },
   methods: {
     displayError(msg: string): void {
       this.isError = true;
@@ -156,17 +160,24 @@ export default defineComponent({
         this.isError = false;
         this.submitted = false;
       }, 3000);
-    }
+    },
+    ...mapActions(["setUserToken"])
   },
   watch: {
-    res: function(newValue: RegisterResponse) {
+    res: async function(newValue: RegisterResponse) {
       this.showSpinner = true;
       this.submitted = true;
+      console.log('result from signing up', newValue);
       if (newValue.register.errors && newValue.register.errors.length) {
         const msg = newValue.register.errors[0].message;
         this.displayError(msg);
         this.resetError();
+        console.log('error while getting signup res', newValue.register.errors[0]);
       } else {
+        //set the token for local state memory on the user to be the auth'd state of the app? 
+        await this.setUserToken(newValue.register.token);
+        console.log('did user get the token stored locally after successful signup???', this.user);
+        
         this.successMsg = "Success!! teleporting to home page";
         setTimeout(() => {
           this.showSpinner = false;
