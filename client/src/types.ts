@@ -53,7 +53,6 @@ export interface LoginArgs {
  */
 export interface LoginResponse {
 	login: {
-		token: string;
 		errors: null
 		| [{
 			field: string;
@@ -62,11 +61,23 @@ export interface LoginResponse {
 		user: null
 		| {
 			email: string;
+			username: string;
+			token: string;
 		};
 	};
 }
 export interface LogoutResponse {
-	logout: boolean;
+	logout: {
+			errors: [{
+					field: string;
+					message: string;
+			}] | null;
+			user: {
+					username: string;
+					email: string;
+					token: string;
+			} | null;
+	};
 }
 /**
  * expected me query response
@@ -80,4 +91,10 @@ export interface MeQueryResponse {
 	username: string;
 	id: number;
 	email: string;
+}
+
+export interface UserState {
+	token?: string;
+	email: string;
+	username: string;
 }

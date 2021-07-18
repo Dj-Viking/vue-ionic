@@ -1,21 +1,24 @@
 import decode, { JwtPayload } from 'jwt-decode';
+import jwt from "jsonwebtoken";
+import { UserState } from '@/types';
 
 class AuthService {
 
-  async getProfile(): Promise<JwtPayload | false> {
+  public async getProfile(): Promise<JwtPayload | false> {
     if (typeof (await this.getToken()) === "string") {
-      return decode((await this.getToken()) as string);  
+      const profile = await decode((await this.getToken()) as string);
+      return profile;
     } else return false;
   }
 
-  async loggedIn(): Promise<boolean> {
+  public async loggedIn(): Promise<boolean> {
     // Checks if there is a saved token and it's still valid
     const token = await this.getToken();
     //is token a truthy value and token is not expired
     return !!token && !this.isTokenExpired(token);
   }
 
-  isTokenExpired(token: string): boolean {
+  public isTokenExpired(token: string): boolean {
     try {
       const decoded: JwtPayload = decode(token);
       if (decoded.exp < Date.now() / 1000) 
@@ -27,7 +30,7 @@ class AuthService {
     }
   }
 
-  async getToken(): Promise<string | false> {
+  public async getToken(): Promise<string | false> {
     // Retrieves the user token from localStorage
     return new Promise((resolve) => {
       const token = localStorage.getItem('id_token');
@@ -35,7 +38,7 @@ class AuthService {
     })
   }
 
-  async setToken(token: string): Promise<void> {
+  public async setToken(token: string): Promise<void> {
     // Saves user token to localStorage
     return new Promise((resolve) => {
       localStorage.setItem('id_token', token);
@@ -43,11 +46,22 @@ class AuthService {
     });
   }
 
-  async clearToken(): Promise<void> {
+  public signToken(user: UserState): string {
+    const payload = {
+      username: user.username,
+      email: user.email,
+    };
+  
+    return jwt.sign(payload,
+                    payload.toString() as string,
+                    { expiresIn: "2h" });
+  }
+
+  public async clearToken(): Promise<void | null> {
       const token = await this.getToken();
       if (token) {
         localStorage.removeItem('id_token');
-      } else return;
+      } else return null;
   }
 }
 

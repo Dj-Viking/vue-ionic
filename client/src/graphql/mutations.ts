@@ -23,6 +23,8 @@ export function createLoginMutation(): string {
         }
         user{
           email
+          token
+          username
         }
       }
     }
@@ -30,8 +32,17 @@ export function createLoginMutation(): string {
 }
 export function createLogoutMutation(): string {
   return `
-    mutation logout{
-      logout
+  mutation logout($email: String!) {
+    logout(email: $email){
+      errors{
+        field
+        message
+      }
+      user {
+        username
+        email
+        token
+      }
     }
-  `;
+  }`;
 }

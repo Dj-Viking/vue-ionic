@@ -72,14 +72,15 @@ import {
   IonButton
 } from '@ionic/vue';
 import { useMutation } from "@vue/apollo-composable";
-import { defineComponent, ref, onMounted } from "vue"
+import { defineComponent, ref, onMounted, inject } from "vue"
 import router from "../router";
 import BaseLayout from "../components/base/BaseLayout.vue"
 import Spinner from "../components/spinner.vue";
 import { gql } from "graphql-tag"
 import { createLoginMutation } from "../graphql/mutations"
-import { LoginResponse } from "../types";
+import { LoginResponse, UserState } from "../types";
 import { mapActions } from "vuex";
+import testAuthService from "../utils/authService"; //aliased to test for testing
 export default defineComponent({
   components: {
     BaseLayout,
@@ -89,6 +90,8 @@ export default defineComponent({
     IonButton
   },
   setup() {
+    //global token injection to this component to set later on login
+    const token = inject("$token");
     const email = ref("");
     const password = ref("");
     const res = ref({});
@@ -108,7 +111,8 @@ export default defineComponent({
         }
       }
     );
-    onLoginDone(result => {
+    onLoginDone((result) => {
+      //set global token from login result
       res.value = result.data;
       submitted.value = false;
     });
@@ -118,14 +122,15 @@ export default defineComponent({
       password.value = "";
     }
     onMounted(initFields);
-    return { submitLogin, email, password, loginIsLoading, loginError, res, submitted };
+    return { submitLogin, email, password, loginIsLoading, loginError, res, submitted, token };
   },
   data() { 
     return {
-      isError: false,
-      errMsg: "",
-      successMsg: "",
-      showSpinner: false
+      isError: false as boolean,
+      errMsg: "" as string,
+      successMsg: "" as string,
+      showSpinner: false as boolean,
+      authService: testAuthService as typeof testAuthService,
     }
   },
   methods: {
@@ -141,25 +146,48 @@ export default defineComponent({
         this.submitted = false;
       }, 3000);
     },
-    ...mapActions(["setUser"])
+    ...mapActions(["setUser", "setUserToken"]),
+    //test function of setting token in local storage
+    async tokenSetter(): Promise<void | string> {
+      const token = testAuthService.signToken({
+        username: "kdjfkjf",
+        email: "akdjfkdj@kdfjdjf.com",
+      } as UserState);
+      this.token = token;
+      console.log('generated token ready to set in local storage', this.token);
+      return testAuthService.setToken(token);
+    }
+  },
+  created(){
+    console.log('global token', this.token);
+    
   },
   watch: {
-    res: function(newValue: LoginResponse) {
+    res: async function(newValue: LoginResponse): Promise<void> {
       this.showSpinner = true;
       this.submitted = true;
+      console.log('login response', newValue);
+      
       if (newValue.login.errors && newValue.login.errors.length) {
         const msg = newValue.login.errors[0].message;
         this.displayError(msg);
         this.resetError();
-      } else {
-        this.setUser({me: newValue.login.user});
+      } else if (newValue.login.user){
+        // set the global vue token that we want to set as the auth header somehow??
+        this.token = newValue.login.user.token;
+        console.log('set global user token', this.token);
+        
+        //take the login response data and sign a token put it in local storage
+        await testAuthService.setToken(newValue.login.user.token)
+        await this.setUserToken(newValue.login.user.token);
+        this.setUser(newValue.login.user);
         this.successMsg = "Success!! teleporting to home page";
         setTimeout(() => {
           this.showSpinner = false;
           this.submitted = false;
           router.back();
         }, 4000);
-      }
+      } else { return console.error("there was no truthy value returned for the user object or errors"); }
     }
   },
 })

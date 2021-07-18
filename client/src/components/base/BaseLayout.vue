@@ -60,7 +60,7 @@
 
 <script lang="ts">
 //get like a global auth class to check if the page we are looking at while authenticated on should have a different look
-import { defineComponent, ref } from "@vue/runtime-core";
+import { defineComponent, ref, inject } from "@vue/runtime-core";
 import router from "../../router";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { createMeQuery } from "../../graphql/queries";
@@ -80,7 +80,10 @@ import {
 import { LogoutResponse, MeQueryResponse } from "../../types";
 
 export default defineComponent({
-  setup(){
+  // eslint-disable-next-line
+  setup(ctx: any){
+    
+    const token = inject("$token");
     const logoutRes = ref({});
     const { result, refetch } = useQuery(gql`${createMeQuery()}`);
     const { 
@@ -90,7 +93,7 @@ export default defineComponent({
     onLogoutDone(result => {
       logoutRes.value = result.data
     });
-    return { result, logout, logoutRes, refetch };
+    return { result, logout, logoutRes, refetch, token };
   },
   props: {
     pageTitle: String,
@@ -130,7 +133,9 @@ export default defineComponent({
     },
     logoutRes: function(newValue: LogoutResponse) {
       if (newValue.logout){
-        this.setUser({me: null});
+        this.setUser(newValue.logout.user);
+        // set global token to empty string
+        this.token = "";
       }
     },
     "$route": function() {
@@ -144,6 +149,7 @@ export default defineComponent({
     }
   },
   created(){
+    console.log("checking global apollo client")
     if (this.user.me && this.user.me.username) {
       this.isLoggedIn = true;
     }

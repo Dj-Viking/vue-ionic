@@ -27,7 +27,7 @@ import "./theme/variables.css";
 import "./theme/core.css";
 
 //apollo stuff
-import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client/core";
+import { ApolloClient, ApolloLink, concat, createHttpLink, InMemoryCache } from "@apollo/client/core";
 import { DefaultApolloClient } from "@vue/apollo-composable";
 import AuthService from "./utils/authService";
 
@@ -36,6 +36,18 @@ const cache = new InMemoryCache()
 
 let token; 
 (async() => token = await AuthService.getToken())()
+
+const authMiddleware = new ApolloLink((operation, forward) => {
+  // add the authorization to the headers
+  operation.setContext(({ headers = {} }) => ({
+    headers: {
+      ...headers,
+      authorization: `Bearer ${localStorage.getItem("id_token") || null}`,
+    }
+  }));
+  return forward(operation);
+})
+
 // HTTP connection to the API
 const httpLink = createHttpLink({
   // You should use an absolute URL here
@@ -48,12 +60,13 @@ const httpLink = createHttpLink({
 
 // Create the apollo client
 const apolloClient = new ApolloClient({
-  link: httpLink,
+  link: concat(authMiddleware, httpLink),
   cache,
 });
 const app = createApp({
   setup() {
-    provide(DefaultApolloClient, apolloClient)
+    provide(DefaultApolloClient, apolloClient);
+    provide("$token", "laksjflaksjdflaskjdf");
   },
   render: () => h(App)
 })
