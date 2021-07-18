@@ -399,7 +399,7 @@ export class UserResolver {
   async logout(
     @Arg("email", () => String) email: string,
     @Ctx() context: MyContext
-  ): Promise<UserResponse> {
+  ): Promise<UserResponse | ErrorResponse> {
     console.log('context user', context.req.user);
     try {
       //remove token from user table?
