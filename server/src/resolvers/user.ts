@@ -338,14 +338,14 @@ export class UserResolver {
           password: "password"
         })
         {
-          token
           errors {
             field
             message
           }
           user {
-            id
+            token
             username
+            email
           }
         }
     }
@@ -353,13 +353,14 @@ export class UserResolver {
     {
         login(options: $options)
         {
-          token
           errors{
             field
             message
           }
           user{
+            token
             email
+            username
           }
         }
     }
@@ -387,7 +388,23 @@ export class UserResolver {
     // req.session.welcomeBackMsg = `Welcome back ${user.username}!`;
     // req.session.username = user.username;
 
+    //sign a token with the user's credentials
     const token = signToken(user);
+
+    //update the user table to contain the new token on login
+    const changedUser = await getConnection()
+    .getRepository(User)
+    .createQueryBuilder("user")
+    .update<User>(User, { 
+      token: token
+    })
+    .where("email = :email", { email: options.email })
+    .returning(['username', 'token', 'email'])
+    .updateEntity(true)
+    .execute();
+    if (!changedUser) return new ErrorResponse("user", "user not found");
+    // context.req.user = null;
+    console.log('changed user', changedUser.raw[0]);
 
     return {
       token,
@@ -403,7 +420,10 @@ export class UserResolver {
     console.log('context user', context.req.user);
     try {
       //remove token from user table?
-      const changedUser = await getConnection().getRepository(User).createQueryBuilder("user").update<User>(User, { 
+      const changedUser = await getConnection()
+      .getRepository(User)
+      .createQueryBuilder("user")
+      .update<User>(User, { 
         token: ""
       })
       .where("email = :email", { email: email })

@@ -1,11 +1,11 @@
 import { request } from "graphql-request";
 import { User } from "../entities/User";
-// import { User } from "../entities/User";
 import { 
   HOST, 
   LOGIN_MUTATION,  
   REGISTER_EMAIL, 
-  REGISTER_MUTATION 
+  REGISTER_MUTATION, 
+  REGISTER_USERNAME
 } from "../constants";
 import { connectDb } from "./utils/connectDb";
 import { ANSI_ESCAPES, LoginResponse, RegisterResponse } from "../types";
@@ -48,7 +48,9 @@ describe("do the login mutation", () => {
     // check the response
     logJson(res);
     expect(res.login.errors).toBeNull();
-    expect(res.login.user.email).toEqual(REGISTER_EMAIL);
+    expect(res.login.user?.token).toBeTruthy();
+    expect(res.login.user?.email).toEqual(REGISTER_EMAIL);
+    expect(res.login.user?.username).toEqual(REGISTER_USERNAME);
   }); 
 });
 

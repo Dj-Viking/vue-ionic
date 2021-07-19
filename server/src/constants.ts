@@ -1,5 +1,4 @@
 require("dotenv").config();
-import { MeResponse } from "./types";
 
 const {
   TEST_EMAIL,
@@ -24,17 +23,10 @@ export const ME_QUERY: string = `
   query me {
     me {
       email
+      username
     }
   }
 `;
-/**
- * expect to get whatever user data we want from the query for now just email on this constant
- */
-export const CORRECT_ME_RESPONSE: MeResponse = {
-  "me": {
-    "email": `${REGISTER_EMAIL}`
-  }
-};
 
 /**
  * string literal of the graphql mutation for the register action
@@ -87,8 +79,9 @@ mutation login {
       field
       message
     }
-    token
     user {
+      token
+      username
       email
     }
   }

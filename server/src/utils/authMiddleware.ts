@@ -1,8 +1,11 @@
 import { JwtData, MyContext } from "../types";
 import jwt, { JwtPayload } from "jsonwebtoken";
 require('dotenv').config();
-const secret: string | undefined = process.env.SECRET;
-const expiration: string | undefined = process.env.EXPIRATION;
+
+const {
+  SECRET,
+  EXPIRATION
+} = process.env
 
 
 export function authMiddleware(
@@ -27,8 +30,8 @@ export function authMiddleware(
     }
 
     const jwtPayload: JwtPayload | string = jwt.verify(token as string,
-                                                       secret as string,
-                                                       { maxAge: expiration }); //maxage deprecated but still accepted...
+                                                       SECRET as string,
+                                                       { maxAge: EXPIRATION }); //maxage deprecated but still accepted...
     // console.log('payload', jwtPayload);
     
     context.req.user = <JwtData>jwtPayload;

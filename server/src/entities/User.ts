@@ -10,6 +10,12 @@ import {
 import { ObjectType, Field, Int } from 'type-graphql';
 // import { Post } from './Post';
 
+
+export enum Permissions  {
+  admin = "admin",
+  scrub = "scrub"
+}
+
 //this is now both an object type and an entity
 @ObjectType()
 @Entity()
@@ -45,5 +51,9 @@ export class User extends BaseEntity {
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   token?: string
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  permissions?: Permissions
 
 }

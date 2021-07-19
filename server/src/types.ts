@@ -65,30 +65,33 @@ export interface LoginResponse {
         errors: null | [{
             field: string;
             message: string;
-        }]
-        token: string
-        user: {
-            email: string
-        }
+        }];
+        user: null | {
+            token: string;
+            email: string;
+            username: string;
+        };
     }
 }
 export interface MeResponse {
     me: {
-        email: string
-    }
+        email: string;
+        username: string;
+        token?: string;
+    };
 }
 export interface LogoutResponse {
     logout: {
         errors: [{
-            field: string
-            message: string
-        }] | null
+            field: string;
+            message: string;
+        }] | null;
         user: {
-            username: string,
-            email: string,
-            token: string
-        } | null
-    }
+            username: string;
+            email: string;
+            token: string;
+        } | null;
+    };
 }
 
 export type JwtData = IJwtData;
