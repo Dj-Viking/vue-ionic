@@ -395,13 +395,12 @@ export class UserResolver {
     const changedUser = await getConnection()
     .getRepository(User)
     .createQueryBuilder("user")
-    .update<User>(User, { 
-      token: token
-    })
-    .where("email = :email", { email: options.email })
-    .returning(['username', 'token', 'email'])
-    .updateEntity(true)
-    .execute();
+    .update<User>(User, 
+                  { token: token})
+                                  .where("email = :email", { email: options.email })
+                                  .returning(['username', 'token', 'email'])
+                                  .updateEntity(true)
+                                  .execute();
     if (!changedUser) return new ErrorResponse("user", "user not found");
     // context.req.user = null;
     console.log('changed user', changedUser.raw[0]);
@@ -423,13 +422,12 @@ export class UserResolver {
       const changedUser = await getConnection()
       .getRepository(User)
       .createQueryBuilder("user")
-      .update<User>(User, { 
-        token: ""
-      })
-      .where("email = :email", { email: email })
-      .returning(['username', 'token', 'email'])
-      .updateEntity(true)
-      .execute();
+      .update<User>(User, 
+                    { token: "" })
+                                  .where("email = :email", { email: email })
+                                  .returning(['username', 'token', 'email'])
+                                  .updateEntity(true)
+                                  .execute();
       if (!changedUser) return new ErrorResponse("user", "user not found");
       // context.req.user = null;
       console.log('changed user', changedUser.raw[0]);
