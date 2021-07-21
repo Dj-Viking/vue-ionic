@@ -76,7 +76,7 @@ import {
   IonInput, 
   IonButton
 } from '@ionic/vue';
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, onMounted, SetupContext, EmitsOptions } from "vue";
 import BaseLayout from "../components/base/BaseLayout.vue";
 import router from "../router";
 import Spinner from "../components/spinner.vue";
@@ -100,7 +100,8 @@ export default defineComponent({
     IonButton,
     Spinner
   },
-  setup() {
+  // eslint-disable-next-line
+  setup(this: void, _props, _ctx: SetupContext<EmitsOptions>){
     const email = ref("");
     const username = ref("");
     const password = ref("");

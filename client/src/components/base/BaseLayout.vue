@@ -66,7 +66,7 @@ import { useQuery, useMutation } from "@vue/apollo-composable";
 import { createMeQuery } from "../../graphql/queries";
 import { createLogoutMutation } from "../../graphql/mutations";
 import { gql } from "graphql-tag";
-import { ActionMethod, mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import { 
   IonPage, 
   IonHeader, 
@@ -78,6 +78,7 @@ import {
   IonButton
 } from "@ionic/vue";
 import { LogoutResponse, MeQueryResponse } from "../../types";
+import { EmitsOptions, SetupContext } from "vue";
 
 export default defineComponent({
   props: {
@@ -96,7 +97,7 @@ export default defineComponent({
     IonButton
   },
   // eslint-disable-next-line
-  setup(ctx: any){
+  setup(this: void, _props, _ctx: SetupContext<EmitsOptions>){
     
     const token = inject("$token");
     const logoutRes = ref({});

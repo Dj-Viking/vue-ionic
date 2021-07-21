@@ -72,7 +72,7 @@ import {
   IonButton
 } from '@ionic/vue';
 import { useMutation } from "@vue/apollo-composable";
-import { defineComponent, ref, onMounted, inject } from "vue"
+import { defineComponent, ref, onMounted, inject, SetupContext, EmitsOptions } from "vue"
 import router from "../router";
 import BaseLayout from "../components/base/BaseLayout.vue"
 import Spinner from "../components/spinner.vue";
@@ -89,7 +89,8 @@ export default defineComponent({
     IonInput, 
     IonButton
   },
-  setup() {
+  // eslint-disable-next-line
+  setup(this: void, _props, _ctx: SetupContext<EmitsOptions>){
     //global token injection to this component to set later on login
     const token = inject("$token");
     const email = ref("");
