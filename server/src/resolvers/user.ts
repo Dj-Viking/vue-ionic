@@ -287,7 +287,7 @@ export class UserResolver {
           token: token
         }
       )
-      .returning('*')
+      .returning(['username', 'token', 'email'])
       .execute();
       //only returning the first user object in the array, 
       // i guess I could insert as many objects into the table and will

@@ -11,10 +11,10 @@ export type MyContext = {
     req: Request & {
         session: Session & Partial<SessionData> & {
             userId?: number
-        } & { 
-            welcomeBackMsg?: String 
-        } & { 
-            username?: String 
+        } & {
+            welcomeBackMsg?: String
+        } & {
+            username?: String
         }
     } & {
         user: JwtData | null
@@ -28,7 +28,7 @@ export type MyContext = {
  * @example 
  * console.log(`${red || "\x1b[31m"}`, "red text in the log", `${reset || "\x1b[00m"}`)
  */
- export enum ANSI_ESCAPES {
+export enum ANSI_ESCAPES {
     red = "\x1b[31m",
     green = "\x1b[32m",
     blue = "\x1b[36m",
@@ -57,7 +57,7 @@ export interface RegisterErrorResponse {
                 message: string;
             }
         ];
-        user: null; 
+        user: null;
     }
 }
 export interface LoginResponse {

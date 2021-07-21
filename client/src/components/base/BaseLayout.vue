@@ -66,7 +66,7 @@ import { useQuery, useMutation } from "@vue/apollo-composable";
 import { createMeQuery } from "../../graphql/queries";
 import { createLogoutMutation } from "../../graphql/mutations";
 import { gql } from "graphql-tag";
-import { mapActions, mapGetters } from "vuex";
+import { ActionMethod, mapActions, mapGetters } from "vuex";
 import { 
   IonPage, 
   IonHeader, 
@@ -77,24 +77,9 @@ import {
   IonButtons,
   IonButton
 } from "@ionic/vue";
-import { LogoutResponse, MeQueryResponse } from "../../types";
+import { LogoutResponse, MeQueryResponse, SetUserActionFn, SetUserPayload } from "../../types";
 
 export default defineComponent({
-  // eslint-disable-next-line
-  setup(ctx: any){
-    
-    const token = inject("$token");
-    const logoutRes = ref({});
-    const { result, refetch } = useQuery(gql`${createMeQuery()}`);
-    const { 
-      mutate: logout,
-      onDone: onLogoutDone  
-    } = useMutation(gql`${createLogoutMutation()}`);
-    onLogoutDone(result => {
-      logoutRes.value = result.data
-    });
-    return { result, logout, logoutRes, refetch, token };
-  },
   props: {
     pageTitle: String,
     pageDefaultBackLink: String,
@@ -109,6 +94,21 @@ export default defineComponent({
     IonBackButton,
     IonButtons,
     IonButton
+  },
+  // eslint-disable-next-line
+  setup(ctx: any){
+    
+    const token = inject("$token");
+    const logoutRes = ref({});
+    const { result, refetch } = useQuery(gql`${createMeQuery()}`);
+    const { 
+      mutate: logout,
+      onDone: onLogoutDone  
+    } = useMutation(gql`${createLogoutMutation()}`);
+    onLogoutDone(result => {
+      logoutRes.value = result.data
+    });
+    return { result, logout, logoutRes, refetch, token };
   },
   data() {
     return {

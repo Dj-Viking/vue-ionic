@@ -1,5 +1,6 @@
-import { Memory } from "@/types";
-import { createStore } from "vuex";
+// eslint-disable-next-line
+import { Memory, UserState, SetUserPayload, ClearUserTokenActionFn, GetOneMemoryActionFn, SetUserMutationFn, ClearUserTokenMutationFn, MyStore, SetUserTokenActionFn } from "@/types";
+import { ActionContext, createStore } from "vuex";
 
 //aliased to have dollar sign. export defaults can be named anything once imported
 import $AuthService from "../utils/authService";
@@ -7,10 +8,10 @@ import $AuthService from "../utils/authService";
 const store = createStore({
   state: {
     user: {
-      username: "",
-      email: "",
-      token: "",
-    },
+      username: null,
+      email: null,
+      token: null,
+    } as UserState,
     memories: [
       {
         id: 1,
@@ -33,29 +34,53 @@ const store = createStore({
         image: "./assets/images/mountains.jpg",
         route: "/memories/3"
       },
-    ]
+    ] as Memory[]
   },
   mutations: {
-    SET_USER(state, payload): void {
+    /**
+     * Sets the vuex state user based on the input payload
+     * @type {SetUserMutationFn}
+     */
+    SET_USER(state, payload: SetUserPayload): void {
       state.user = {
         ...state.user,
         ...payload
-      };
+      } as UserState;
       console.log('set user after mutation', state.user);
     },
-    SET_USER_TOKEN(state, payload): void {
+    /**
+     * sets the token string on the user's local state 
+     * @type {SetUserMutationFn}
+     */
+    SET_USER_TOKEN(state, payload: string): void {
       state.user = {
         ...state.user,
         token: payload
-      }
+      } as UserState
       console.log('set token after operation', state.user);
     },
+    /**
+     * clear the user token from the vuex state user
+     * @type {ClearUserTokenMutationFn}
+     */
     CLEAR_USER_TOKEN(state, payload: ""): void {
       state.user.token = payload;
     }
   },
   actions: {
-    async setUserToken(context, payload): Promise<boolean> {
+    /**
+     * perform an async function that calls auth service to set the token in local storage to set
+     * the authorization header for every graphql mutation/query that needs the token in the auth header
+     * and also set the local vuex state user.token 
+     * 
+     * ActionContext has inference of what the current local state of the store as first argument
+     * and second argument is inferred as the rootState 
+     * @type {SetUserTokenActionFn}
+     */
+    async setUserToken(
+      context: ActionContext<MyStore["state"], MyStore["state"]>,
+      payload: string
+    ): Promise<boolean> {
       try {
         //set local state user's token string
         context.commit("SET_USER_TOKEN", payload);
@@ -72,12 +97,14 @@ const store = createStore({
         return Promise.resolve(false)
       }
     },
-    // async getUserToken(context, payload): Promise<null | string> {
-
-    //   if (token) return token;
-    //   else return null;
-    // },
-    async clearUserToken(context, payload = ""): Promise<boolean> {
+    /**
+     * 
+     * @type {ClearUserTokenActionFn}
+     */
+    async clearUserToken(
+      context: ActionContext<MyStore["state"], MyStore["state"]>, 
+      payload = ""
+    ): Promise<boolean> {
       try {
         //send the empty string to the vuex state mutator
         context.commit("CLEAR_USER_TOKEN", payload);
@@ -90,20 +117,32 @@ const store = createStore({
         return Promise.resolve(false);
       }
     },
-    setUser(context, payload): void {
+    /**
+     * @type {SetUserActionFn}
+     */
+    setUser(
+      context: ActionContext<MyStore["state"], MyStore["state"]>,  
+      payload: SetUserPayload
+    ): void {
       return context.commit("SET_USER", payload);
     },
     // eslint-disable-next-line
-    async getUserProfile(context, payload): Promise<null> {
-      try {
-        //get the token from local storage and verify/decode it to get the user data in the token
-      } catch (error) {
-        console.error(error);
-        return Promise.resolve(null);
-      }
-    },
+    // async getUserProfile(_context, _payload): Promise<null> {
+    //   try {
+    //     //get the token from local storage and verify/decode it to get the user data in the token
+    //   } catch (error) {
+    //     console.error(error);
+    //     return Promise.resolve(null);
+    //   }
+    // },
     // eslint-disable-next-line
-    async getOneMemory(_context, payload: { id: string }): Promise<Memory | never> {
+    /**
+     * @type {GetOneMemoryActionFn}
+     */
+    async getOneMemory(
+      _context: ActionContext<MyStore["state"], MyStore["state"]>,
+      payload: { id: string }
+    ): Promise<Memory | never> {
       try {
         const { id } = payload;
         return Promise.resolve(this.state.memories.filter(memory => memory.id === Number(id))[0])

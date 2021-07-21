@@ -1,3 +1,5 @@
+import { ActionContext } from "vuex";
+
 /**
  * image will be a URL link to get load an image
  */
@@ -94,7 +96,48 @@ export interface MeQueryResponse {
 }
 
 export interface UserState {
-	token?: string;
-	email: string;
-	username: string;
+	token?: string | null;
+	email: string | null;
+	username: string | null;
+}
+
+export type SetUserPayload = UserState;
+
+export interface SetUserMutationFn<S, T extends SetUserPayload> {
+	(state: S, payload: T): void;
+}
+export interface SetUserTokenMutationFn<S, T> {
+	(state: S, payload: T): void;
+}
+export interface ClearUserTokenMutationFn<S, T> {
+	(state: S, payload: T): void;
+}
+export interface SetUserActionFn<C extends ActionContext<MyStore["state"], MyStore["state"]>, T> {
+	(context: C, payload: T): void;
+}
+export interface SetUserTokenActionFn<C extends ActionContext<MyStore["state"], MyStore["state"]>, T> {
+	(context: C, payload: T): Promise<boolean>;
+}
+export interface ClearUserTokenActionFn<C extends ActionContext<MyStore["state"], MyStore["state"]>, T> {
+	(context: C, payload: T): void;
+}
+export interface GetOneMemoryActionFn<C extends ActionContext<MyStore["state"], MyStore["state"]>, T> {
+	(context: C, payload: T): Promise<Memory | never>;
+}
+export interface MyStore {
+	state?: {
+		user: UserState;
+		memories: Memory[];
+	};
+	mutations?: {
+		"SET_USER": () => SetUserMutationFn<MyStore["state"], SetUserPayload>;
+		"SET_USER_TOKEN": () => SetUserTokenMutationFn<MyStore["state"], string>;
+		"CLEAR_USER_TOKEN": () => ClearUserTokenMutationFn<MyStore["state"], "">;
+	};
+	actions?: {
+		setUser: () => SetUserActionFn<ActionContext<MyStore["state"], MyStore["state"]>, SetUserPayload>;
+		setUserToken: () => SetUserTokenActionFn<ActionContext<MyStore["state"], MyStore["state"]>, string>;
+		clearUserToken: () => ClearUserTokenActionFn<ActionContext<MyStore["state"], MyStore["state"]>, "">;
+		getOneMemory: () => GetOneMemoryActionFn<ActionContext<MyStore["state"], MyStore["state"]>, number>;
+	};
 }
