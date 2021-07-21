@@ -77,7 +77,7 @@ import {
   IonButtons,
   IonButton
 } from "@ionic/vue";
-import { LogoutResponse, MeQueryResponse, SetUserActionFn, SetUserPayload } from "../../types";
+import { LogoutResponse, MeQueryResponse } from "../../types";
 
 export default defineComponent({
   props: {
