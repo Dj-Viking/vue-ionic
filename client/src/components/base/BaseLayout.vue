@@ -98,9 +98,6 @@ export default defineComponent({
   },
   // eslint-disable-next-line
   setup(this: void, _props, _ctx: SetupContext<EmitsOptions>) {
-    
-    let token = inject("$token");
-    (async () => token = await Auth.getToken());
 
     const globalEmail = inject("$email");
     const isLoggedIn = ref(false);
@@ -117,7 +114,7 @@ export default defineComponent({
       logoutRes.value = result.data
     });
 
-    return { meResult, logout, logoutRes, refetch, token, globalEmail, isLoggedIn };
+    return { meResult, logout, logoutRes, refetch, globalEmail, isLoggedIn };
   },
   data() {
     return {

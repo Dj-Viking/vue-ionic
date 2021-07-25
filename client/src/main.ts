@@ -65,7 +65,6 @@ const apolloClient = new ApolloClient({
   cache,
 });
 const app = createApp({ setup() { provide(DefaultApolloClient, apolloClient);
-                                  provide("$token", null);
                                   provide("$email", null); }
                       , render: () => h(App) })
                                               .use(IonicVue)
