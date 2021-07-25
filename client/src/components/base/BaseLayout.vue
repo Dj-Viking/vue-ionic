@@ -125,7 +125,7 @@ export default defineComponent({
     ...mapGetters(["user"])
   },
   methods: {
-    ...mapActions(["setUser", "setMe"])
+    ...mapActions(["setMe"])
   },
   watch: {
     meResult: async function(newValue: MeQueryResponse) {
