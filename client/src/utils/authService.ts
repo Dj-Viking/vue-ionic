@@ -59,13 +59,14 @@ class AuthService {
   
     return jwt.sign(payload,
                     payload.toString() as string,
-                    { expiresIn: "2h" });
+                    { expiresIn: "1h" });
   }
 
   public clearToken(): void {
       const token = this.getToken();
       if (token) {
         localStorage.removeItem('id_token');
+        localStorage.removeItem('global_email');
       } else return;
   }
 }

@@ -159,7 +159,7 @@ export default defineComponent({
         this.resetError();
       } else if (newValue.login.user){
         //set global email for logging out later
-        this.globalEmail = newValue.login.user.email;
+        localStorage.setItem("global_email", newValue.login.user.email);
         //take the login response data and sign a token put it in local storage
         await testAuthService.setToken(newValue.login.user.token)
         await this.setUserToken(newValue.login.user.token);

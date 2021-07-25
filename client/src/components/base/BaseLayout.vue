@@ -107,7 +107,7 @@ export default defineComponent({
     const { 
       mutate: logout,
       onDone: onLogoutDone  
-    } = useMutation(gql`${createLogoutMutation()}`, { variables: { email: "viking@viking.com" }});
+    } = useMutation(gql`${createLogoutMutation()}`, { variables: { email: globalEmail }});
 
     onLogoutDone(result => {
       isLoggedIn.value = false;
@@ -136,6 +136,7 @@ export default defineComponent({
         this.isLoggedIn = false;
       } else {
         this.setMe(newValue);
+        localStorage.setItem("global_email", newValue.me.email);
         await Auth.setToken(newValue.me.token);
         this.isLoggedIn = true;
       }
@@ -148,17 +149,10 @@ export default defineComponent({
     },
     logoutRes: async function(newValue: LogoutResponse) {
       console.log("what is the logout response new value", newValue);
-      
-      if (newValue.logout) {
-        if (newValue.logout.user.token === "") {
-          console.log("checking new value logged out token is blank", newValue.logout.user.token === "");
-          
-          this.setMe({});
-          this.isLoggedIn = false;
-        }
-        // this.setUser(newValue.logout.user);
-        // set global token to empty string
-        Auth.clearToken();
+      localStorage.removeItem("global_email");
+      Auth.clearToken();
+      if (newValue.logout.user === null) {
+        this.isLoggedIn = false;
       }
     },
     "$route": async function() {

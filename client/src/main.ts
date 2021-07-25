@@ -65,7 +65,7 @@ const apolloClient = new ApolloClient({
   cache,
 });
 const app = createApp({ setup() { provide(DefaultApolloClient, apolloClient);
-                                  provide("$email", null); }
+                                  provide("$email", `${localStorage.getItem("global_email") || null}`) }
                       , render: () => h(App) })
                                               .use(IonicVue)
                                               .use(router)
