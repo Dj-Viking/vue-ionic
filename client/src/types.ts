@@ -113,7 +113,7 @@ export interface SetUserTokenMutationFn<S, T> {
 export interface ClearUserTokenMutationFn<S, T> {
     (state: S, payload: T): void;
 }
-export interface SetUserActionFn<C extends ActionContext<MyStore["state"], MyStore["state"]>, T> {
+export interface SetMeActionFn<C extends ActionContext<MyStore["state"], MyStore["state"]>, T> {
     (context: C, payload: T): void;
 }
 export interface SetUserTokenActionFn<C extends ActionContext<MyStore["state"], MyStore["state"]>, T> {
@@ -131,12 +131,12 @@ export interface MyStore {
         memories: Memory[];
     };
     mutations?: {
-        "SET_USER": () => SetUserMutationFn<MyStore["state"], MeQueryResponse>;
+        "SET_ME": () => SetUserMutationFn<MyStore["state"], MeQueryResponse>;
         "SET_USER_TOKEN": () => SetUserTokenMutationFn<MyStore["state"], string>;
         "CLEAR_USER_TOKEN": () => ClearUserTokenMutationFn<MyStore["state"], "">;
     };
     actions?: {
-        setUser: () => SetUserActionFn<ActionContext<MyStore["state"], MyStore["state"]>, MeQueryResponse>;
+        setMe: () => SetMeActionFn<ActionContext<MyStore["state"], MyStore["state"]>, MeQueryResponse>;
         setUserToken: () => SetUserTokenActionFn<ActionContext<MyStore["state"], MyStore["state"]>, string>;
         clearUserToken: () => ClearUserTokenActionFn<ActionContext<MyStore["state"], MyStore["state"]>, "">;
         getOneMemory: () => GetOneMemoryActionFn<ActionContext<MyStore["state"], MyStore["state"]>, number>;

@@ -41,11 +41,16 @@ const store = createStore({
      * Sets the vuex state user based on the input payload
      * this is getting the me {} object from the MeQuery so lets just take out what's in the me object 
      * and set it to the user
-     * @type {MyStore["mutations"]["SET_USER"]}
+     * @type {MyStore["mutations"]["SET_ME"]}
      */
-    SET_ME(state, payload: MeQueryResponse): void {
+    SET_ME(
+      state: MyStore["state"],
+      payload: MeQueryResponse
+    ): void {
       console.log('what is the payload', payload);
 
+      //for some reason eslint thinks I shouldn't check if payload has a property before I try to access the values in the property??
+      // error  Do not access Object.prototype method 'hasOwnProperty' from target object
       // eslint-disable-next-line
       if (payload.hasOwnProperty("me")) {
         state.user = {
@@ -65,7 +70,10 @@ const store = createStore({
      * sets the token string on the user's local state 
      * @type {MyStore["mutations"]["SET_USER_TOKEN"]}
      */
-    SET_USER_TOKEN(state, payload: string): void {
+    SET_USER_TOKEN(
+      state: MyStore["state"], 
+      payload: string
+    ): void {
       state.user = {
         ...state.user,
         token: payload
@@ -76,7 +84,10 @@ const store = createStore({
      * clear the user token from the vuex state user
      * @type {MyStore["mutations"]["CLEAR_USER_TOKEN"]}
      */
-    CLEAR_USER_TOKEN(state, payload: ""): void {
+    CLEAR_USER_TOKEN(
+      state: MyStore["state"], 
+      payload: ""
+    ): void {
       state.user.token = payload;
     }
   },
@@ -106,7 +117,7 @@ const store = createStore({
         if (typeof (await AuthService.getToken()) !== "string" ) return Promise.resolve(false);
         else return Promise.resolve(true);
       } catch (error) {
-        console.error(error);
+        console.error("error when setting a user token", error);
         return Promise.resolve(false)
       }
     },
@@ -126,12 +137,12 @@ const store = createStore({
         if ((await AuthService.getToken()) === null) return Promise.resolve(false);
         return Promise.resolve(true);
       } catch (error) {
-        console.error(error);
+        console.error("error when clearing a user token", error);
         return Promise.resolve(false);
       }
     },
     /**
-     * @type {MyStore["actions"]["setUser"]}
+     * @type {MyStore["actions"]["setMe"]}
      */
     setMe(
       context: ActionContext<MyStore["state"], MyStore["state"]>,
@@ -151,7 +162,7 @@ const store = createStore({
         const { id } = payload;
         return Promise.resolve(this.state.memories.filter(memory => memory.id === Number(id))[0])
       } catch (error) {
-        console.error(error);
+        console.error("error when getting one memory", error);
         return Promise.reject(error);
       }
     }
