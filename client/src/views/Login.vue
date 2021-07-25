@@ -8,7 +8,6 @@
         submitLogin({
           options: {
             email,
-            username,
             password
           }
         })
@@ -78,7 +77,7 @@ import BaseLayout from "../components/base/BaseLayout.vue"
 import Spinner from "../components/spinner.vue";
 import { gql } from "graphql-tag"
 import { createLoginMutation } from "../graphql/mutations"
-import { LoginResponse, UserState } from "../types";
+import { LoginResponse } from "../types";
 import { mapActions } from "vuex";
 import testAuthService from "../utils/authService"; //aliased to test for testing
 export default defineComponent({
@@ -92,10 +91,10 @@ export default defineComponent({
   // eslint-disable-next-line
   setup(this: void, _props, _ctx: SetupContext<EmitsOptions>){
     //global token injection to this component to set later on login
-    const token = inject("$token");
+    const globalEmail = inject("$email");
     const email = ref("");
     const password = ref("");
-    const res = ref({});
+    const loginRes = ref({});
     const submitted = ref(false);
     const { 
       mutate: submitLogin, 
@@ -114,7 +113,7 @@ export default defineComponent({
     );
     onLoginDone((result) => {
       //set global token from login result
-      res.value = result.data;
+      loginRes.value = result.data;
       submitted.value = false;
     });
     function initFields(): void {
@@ -123,7 +122,7 @@ export default defineComponent({
       password.value = "";
     }
     onMounted(initFields);
-    return { submitLogin, email, password, loginIsLoading, loginError, res, submitted, token };
+    return { submitLogin, email, password, loginIsLoading, loginError, loginRes, submitted, globalEmail };
   },
   data() { 
     return {
@@ -147,48 +146,33 @@ export default defineComponent({
         this.submitted = false;
       }, 3000);
     },
-    ...mapActions(["setUser", "setUserToken"]),
-    //test function of setting token in local storage
-    async tokenSetter(): Promise<void | string> {
-      const token = testAuthService.signToken({
-        username: "kdjfkjf",
-        email: "akdjfkdj@kdfjdjf.com",
-      } as UserState);
-      this.token = token;
-      console.log('generated token ready to set in local storage', this.token);
-      return testAuthService.setToken(token);
-    }
-  },
-  created(){
-    console.log('global token', this.token);
-    
+    ...mapActions(["setMe", "setUserToken"]),
   },
   watch: {
-    res: async function(newValue: LoginResponse): Promise<void> {
+    loginRes: async function(newValue: LoginResponse): Promise<void> {
       this.showSpinner = true;
       this.submitted = true;
       console.log('login response', newValue);
-      
       if (newValue.login.errors && newValue.login.errors.length) {
         const msg = newValue.login.errors[0].message;
         this.displayError(msg);
         this.resetError();
       } else if (newValue.login.user){
-        // set the global vue token that we want to set as the auth header somehow??
-        this.token = newValue.login.user.token;
-        console.log('set global user token', this.token);
-        
+        //set global email for logging out later
+        this.globalEmail = newValue.login.user.email;
         //take the login response data and sign a token put it in local storage
         await testAuthService.setToken(newValue.login.user.token)
         await this.setUserToken(newValue.login.user.token);
-        this.setUser(newValue.login.user);
+        this.setMe(newValue.login.user);
         this.successMsg = "Success!! teleporting to home page";
         setTimeout(() => {
+          this.email = "";
+          this.password = "";
           this.showSpinner = false;
           this.submitted = false;
           router.back();
         }, 4000);
-      } else { return console.error("there was no truthy value returned for the user object or errors"); }
+      } else return console.error("there was no truthy value returned for the user object or errors"); 
     }
   },
 })

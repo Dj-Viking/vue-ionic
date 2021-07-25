@@ -1,9 +1,9 @@
 // eslint-disable-next-line
-import { Memory, UserState, SetUserPayload, ClearUserTokenActionFn, GetOneMemoryActionFn, SetUserMutationFn, ClearUserTokenMutationFn, MyStore, SetUserTokenActionFn } from "@/types";
+import { Memory, UserState, ClearUserTokenActionFn, GetOneMemoryActionFn, SetUserMutationFn, ClearUserTokenMutationFn, MyStore, SetUserTokenActionFn, MeQueryResponse } from "@/types";
 import { ActionContext, createStore } from "vuex";
 
 //aliased to have dollar sign. export defaults can be named anything once imported
-import $AuthService from "../utils/authService";
+import AuthService from "../utils/authService";
 
 const store = createStore({
   state: {
@@ -39,18 +39,31 @@ const store = createStore({
   mutations: {
     /**
      * Sets the vuex state user based on the input payload
-     * @type {SetUserMutationFn}
+     * this is getting the me {} object from the MeQuery so lets just take out what's in the me object 
+     * and set it to the user
+     * @type {MyStore["mutations"]["SET_USER"]}
      */
-    SET_USER(state, payload: SetUserPayload): void {
-      state.user = {
-        ...state.user,
-        ...payload
-      } as UserState;
-      console.log('set user after mutation', state.user);
+    SET_ME(state, payload: MeQueryResponse): void {
+      console.log('what is the payload', payload);
+
+      // eslint-disable-next-line
+      if (payload.hasOwnProperty("me")) {
+        state.user = {
+          ...state.user,
+          ...payload.me
+        } as UserState;
+      } else {
+        state.user = {
+          ...state.user,
+          ...payload
+        } as UserState;
+      }
+
+      console.log('set me after set me mutation', state.user);
     },
     /**
      * sets the token string on the user's local state 
-     * @type {SetUserMutationFn}
+     * @type {MyStore["mutations"]["SET_USER_TOKEN"]}
      */
     SET_USER_TOKEN(state, payload: string): void {
       state.user = {
@@ -61,7 +74,7 @@ const store = createStore({
     },
     /**
      * clear the user token from the vuex state user
-     * @type {ClearUserTokenMutationFn}
+     * @type {MyStore["mutations"]["CLEAR_USER_TOKEN"]}
      */
     CLEAR_USER_TOKEN(state, payload: ""): void {
       state.user.token = payload;
@@ -75,7 +88,7 @@ const store = createStore({
      * 
      * ActionContext has inference of what the current local state of the store as first argument
      * and second argument is inferred as the rootState 
-     * @type {SetUserTokenActionFn}
+     * @type {MyStore["actions"]["setUserToken"]}
      */
     async setUserToken(
       context: ActionContext<MyStore["state"], MyStore["state"]>,
@@ -89,8 +102,8 @@ const store = createStore({
         // and can't be used anymore and then have to log in again or 
 
         //token comes from the graphql mutation of logging in or signing up
-        await $AuthService.setToken(payload);
-        if (typeof (await $AuthService.getToken()) !== "string" ) return Promise.resolve(false);
+        await AuthService.setToken(payload);
+        if (typeof (await AuthService.getToken()) !== "string" ) return Promise.resolve(false);
         else return Promise.resolve(true);
       } catch (error) {
         console.error(error);
@@ -99,7 +112,7 @@ const store = createStore({
     },
     /**
      * 
-     * @type {ClearUserTokenActionFn}
+     * @type {MyStore["actions"]["clearUserToken"]}
      */
     async clearUserToken(
       context: ActionContext<MyStore["state"], MyStore["state"]>, 
@@ -109,8 +122,8 @@ const store = createStore({
         //send the empty string to the vuex state mutator
         context.commit("CLEAR_USER_TOKEN", payload);
         //destroy the token in local storage
-        await $AuthService.clearToken();
-        if ((await $AuthService.getToken()) === false) return Promise.resolve(false);
+        AuthService.clearToken();
+        if ((await AuthService.getToken()) === null) return Promise.resolve(false);
         return Promise.resolve(true);
       } catch (error) {
         console.error(error);
@@ -118,26 +131,17 @@ const store = createStore({
       }
     },
     /**
-     * @type {SetUserActionFn}
+     * @type {MyStore["actions"]["setUser"]}
      */
-    setUser(
-      context: ActionContext<MyStore["state"], MyStore["state"]>,  
-      payload: SetUserPayload
+    setMe(
+      context: ActionContext<MyStore["state"], MyStore["state"]>,
+      payload: UserState
     ): void {
-      return context.commit("SET_USER", payload);
+      return context.commit("SET_ME", payload);
     },
     // eslint-disable-next-line
-    // async getUserProfile(_context, _payload): Promise<null> {
-    //   try {
-    //     //get the token from local storage and verify/decode it to get the user data in the token
-    //   } catch (error) {
-    //     console.error(error);
-    //     return Promise.resolve(null);
-    //   }
-    // },
-    // eslint-disable-next-line
     /**
-     * @type {GetOneMemoryActionFn}
+     * @type {MyStore["actions"]["getOneMemory"]}
      */
     async getOneMemory(
       _context: ActionContext<MyStore["state"], MyStore["state"]>,

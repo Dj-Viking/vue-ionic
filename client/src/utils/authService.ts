@@ -5,7 +5,7 @@ import { UserState } from '@/types';
 class AuthService {
 
   public async getProfile(): Promise<JwtPayload | false> {
-    if (typeof (await this.getToken()) === "string") {
+    if (typeof this.getToken() === "string") {
       const profile = await decode((await this.getToken()) as string);
       return profile;
     } else return false;
@@ -18,23 +18,28 @@ class AuthService {
     return !!token && !this.isTokenExpired(token);
   }
 
-  public isTokenExpired(token: string): boolean {
+  public async isTokenExpired(token: string): Promise<boolean | string> {
+    console.log("token we're trying to check", token);
+    
     try {
+      if ((await this.getToken()) === null) return;
       const decoded: JwtPayload = decode(token);
       if (decoded.exp < Date.now() / 1000) 
         return true;
       else 
         return false;
     } catch (err) {
-      return false;
+      console.error("error when verifying expiration", err);
+      return "invalid token"
     }
   }
 
-  public async getToken(): Promise<string | false> {
-    // Retrieves the user token from localStorage
+  public async getToken(): Promise<string | null> {
     return new Promise((resolve) => {
+      // Retrieves the user token from localStorage
       const token = localStorage.getItem('id_token');
-      token ? resolve(token) : resolve(false);
+      if (token) resolve(token);
+      else return resolve(null);
     })
   }
 
@@ -57,11 +62,11 @@ class AuthService {
                     { expiresIn: "2h" });
   }
 
-  public async clearToken(): Promise<void | null> {
-      const token = await this.getToken();
+  public clearToken(): void {
+      const token = this.getToken();
       if (token) {
         localStorage.removeItem('id_token');
-      } else return null;
+      } else return;
   }
 }
 

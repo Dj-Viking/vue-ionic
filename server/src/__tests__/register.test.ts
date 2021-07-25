@@ -13,11 +13,11 @@ import { logJson } from "../__tests__/utils/helpers";
 
 describe("Tests the user register", () => {
   it("get expected response from the register mutation", async () => {
-    console.log("a;lskdflkajsflaskjdflasjkflsadkjflaskjflasdkjflk");
-    
+
     console.log(`${ANSI_ESCAPES.blue}`, `Registering a new user`, `${ANSI_ESCAPES.reset}`);
     const res: RegisterResponse = await request(HOST + "/graphql", REGISTER_MUTATION);
-    console.log('user', logJson(res));
+    logJson(res);
+    console.log('user', res);
     
     expect(res.register.token).toBeTruthy();
     expect(res.register.errors).toBeNull();
@@ -41,7 +41,6 @@ describe("Tests the user register", () => {
   });
 
   it("checks if we delete the user we just made", async () => {
-    
     const connection = await connectDb();
     await User.delete({ email: REGISTER_EMAIL });
     const users = await User.find({ where: { email: REGISTER_EMAIL } });

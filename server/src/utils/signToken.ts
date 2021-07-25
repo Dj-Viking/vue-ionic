@@ -7,6 +7,7 @@ const {
 } = process.env;
 
 export function signToken(user: { username: string, email: string, password: string }): string {
+
   const payload = {
     username: user.username,
     email: user.email,
@@ -15,5 +16,5 @@ export function signToken(user: { username: string, email: string, password: str
 
   return jwt.sign(payload,
                   SECRET as string,
-                  { expiresIn: EXPIRATION });
+                  { expiresIn: EXPIRATION as string });
 }

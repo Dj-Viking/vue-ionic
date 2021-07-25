@@ -100,4 +100,6 @@ export interface IJwtData {
     username: string;
     id: number;
     email: string;
+    iat?: number;
+    exp?: number;
 }
