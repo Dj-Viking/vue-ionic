@@ -3,6 +3,7 @@ import { User } from "../entities/User";
 import { 
   HOST, 
   LOGIN_MUTATION,  
+  // ME_QUERY,  
   REGISTER_EMAIL, 
   REGISTER_MUTATION, 
   REGISTER_USERNAME
@@ -61,7 +62,6 @@ describe("do the login mutation", () => {
 //     console.log(`${ANSI_ESCAPES.blue}`, `check the me query`, `${ANSI_ESCAPES.reset}`);
 //     const res = await request(HOST + "/graphql", ME_QUERY);
 //     logJson(res);
-//     expect(res).toEqual(CORRECT_ME_RESPONSE);
 //   });
 // }); 
 

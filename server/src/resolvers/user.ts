@@ -183,10 +183,12 @@ export class UserResolver {
     // the context is the token with the user information that is verified with each request
     // that has the token in the authorization header 
     try {
+      console.log('context request user', context.req.user);
+      
       //check if user is logged in from the context.req.user
       if (!context.req.user) return null;
   
-      const user = await User.findOne({where: { email: context.req.user.email }});
+      const user = await User.findOne({ where: { email: context.req.user.email } });
       console.log('found user', user);
       
       if (!user) return null;
@@ -243,7 +245,6 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg('options', () => RegisterInput) options: RegisterInput,
-    @Ctx() context: MyContext
   ): Promise<UserResponse> {
     
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -293,22 +294,7 @@ export class UserResolver {
       // i guess I could insert as many objects into the table and will
       // return more created objects into the raw array
       user = result.raw[0];
-      console.log(user);
       
-      context.req.user = {
-        id: user.id,
-        email: user.email,
-        username: user.username
-      }
-
-      //cookie method....not working in production for some reason....sets cookie locally but not in prod...frustrating
-      //login the user after registration
-      // req.session.userId = user.id;
-      // req.session.username = user.username;
-
-
-      // req.user = token;
-      //sign a token with the user information and then return it along with the user
       return {
         token,
         user
@@ -368,7 +354,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg('options', () => LoginInput) options: LoginInput
-  ): Promise<UserResponse>{
+  ): Promise<UserResponse> {
     const user = await User.findOne({ where: { email: options.email } });
     if (!user) 
     {
@@ -383,10 +369,6 @@ export class UserResolver {
       const message = "Incorrect Credentials";
       return new ErrorResponse(field, message);
     }
-    //login the user, and set the cookie
-    // req.session.userId = user.id;
-    // req.session.welcomeBackMsg = `Welcome back ${user.username}!`;
-    // req.session.username = user.username;
 
     //sign a token with the user's credentials
     const token = signToken(user);
@@ -396,7 +378,7 @@ export class UserResolver {
     .getRepository(User)
     .createQueryBuilder("user")
     .update<User>(User, 
-                  { token: token})
+                  { token: token })
                                   .where("email = :email", { email: options.email })
                                   .returning(['username', 'token', 'email'])
                                   .updateEntity(true)
@@ -407,7 +389,7 @@ export class UserResolver {
 
     return {
       token,
-      user
+      user: changedUser.raw[0]
     };
   }
 
@@ -429,7 +411,7 @@ export class UserResolver {
                                   .updateEntity(true)
                                   .execute();
       if (!changedUser) return new ErrorResponse("user", "user not found");
-      // context.req.user = null;
+
       console.log('changed user', changedUser.raw[0]);
       
       return {

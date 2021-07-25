@@ -29,7 +29,6 @@
                   return router.push({name: 'signup'})
                 }
                 if (isHome && isLoggedIn) {
-                  setUser(null);
                   logout();
                   refetch();
                   return router.push({name: 'home'});
@@ -41,7 +40,7 @@
                 }
               }"
             >
-              {{ (!isHome || isHome) && isLoggedIn ? "Logout" : isHome && !isLoggedIn ? "Signup" : null }}
+              {{ (isHome || !isHome) && isLoggedIn ? "Logout" : (!isHome || isHome) && !isLoggedIn ? "Signup" : null }}
             </ion-button>
 
           </ion-buttons>
@@ -79,6 +78,7 @@ import {
 } from "@ionic/vue";
 import { LogoutResponse, MeQueryResponse } from "../../types";
 import { EmitsOptions, SetupContext } from "vue";
+import Auth from "../../utils/authService";
 
 export default defineComponent({
   props: {
@@ -97,63 +97,92 @@ export default defineComponent({
     IonButton
   },
   // eslint-disable-next-line
-  setup(this: void, _props, _ctx: SetupContext<EmitsOptions>){
+  setup(this: void, _props, _ctx: SetupContext<EmitsOptions>) {
     
-    const token = inject("$token");
+    let token = inject("$token");
+    (async () => token = await Auth.getToken());
+
+    const globalEmail = inject("$email");
+    const isLoggedIn = ref(false);
     const logoutRes = ref({});
-    const { result, refetch } = useQuery(gql`${createMeQuery()}`);
+    const { result: meResult, refetch } = useQuery(gql`${createMeQuery()}`);
+
     const { 
       mutate: logout,
       onDone: onLogoutDone  
-    } = useMutation(gql`${createLogoutMutation()}`);
+    } = useMutation(gql`${createLogoutMutation()}`, { variables: { email: "viking@viking.com" }});
+
     onLogoutDone(result => {
+      isLoggedIn.value = false;
       logoutRes.value = result.data
     });
-    return { result, logout, logoutRes, refetch, token };
+
+    return { meResult, logout, logoutRes, refetch, token, globalEmail, isLoggedIn };
   },
   data() {
     return {
       router: router,
-      isLoggedIn: false,
     }
   },
   computed: {
     ...mapGetters(["user"])
   },
   methods: {
-    ...mapActions(["setUser"])
+    ...mapActions(["setUser", "setMe"])
   },
   watch: {
-    result: function(newValue: MeQueryResponse) {
-      this.setUser(newValue);
-      if (this.user.me && this.user.me.username){
-        this.isLoggedIn = true;
-      } else {
+    meResult: async function(newValue: MeQueryResponse) {
+      console.log("what is the me new value response", newValue)
+      //check if we're logged in after each me query response
+      if (newValue.me === null) {
+        this.setMe({});
         this.isLoggedIn = false;
+      } else {
+        this.setMe(newValue);
+        await Auth.setToken(newValue.me.token);
+        this.isLoggedIn = true;
       }
+      const token = await Auth.getToken();
+      const isExpired = await Auth.isTokenExpired(token);
+      if (isExpired === false) this.isLoggedIn = true;
+      else this.isLoggedIn = false;
+
+      console.log("is token expired", isExpired)
     },
-    logoutRes: function(newValue: LogoutResponse) {
-      if (newValue.logout){
-        this.setUser(newValue.logout.user);
+    logoutRes: async function(newValue: LogoutResponse) {
+      console.log("what is the logout response new value", newValue);
+      
+      if (newValue.logout) {
+        if (newValue.logout.user.token === "") {
+          console.log("checking new value logged out token is blank", newValue.logout.user.token === "");
+          
+          this.setMe({});
+          this.isLoggedIn = false;
+        }
+        // this.setUser(newValue.logout.user);
         // set global token to empty string
-        this.token = "";
+        Auth.clearToken();
       }
     },
-    "$route": function() {
+    "$route": async function() {
+      //wait for the refetch
+      await this.refetch();
+      const token = await Auth.getToken();
+      const isExpired = await Auth.isTokenExpired(token);
+      if (isExpired === false) this.isLoggedIn = true;
+      else this.isLoggedIn = false;
+      console.log("watching for route changen are we logged in", this.isLoggedIn);
       //get the user info on route change to get user state if logged in
-      this.refetch();
-      if (this.user.me && this.user.me.username) {
-        this.isLoggedIn = true;
-      } else {
-        this.isLoggedIn = false;
-      }
     }
   },
-  created(){
-    console.log("checking global apollo client")
-    if (this.user.me && this.user.me.username) {
-      this.isLoggedIn = true;
-    }
+  async created() {
+    //if the token isn't expired then keep the logged-in view
+    const token = await Auth.getToken();
+    const isExpired = await Auth.isTokenExpired(token);
+    if (isExpired === false) this.isLoggedIn = true;
+    else this.isLoggedIn = false;
+    console.log("is token expired", isExpired);
+
   }
 })
 </script>

@@ -34,10 +34,11 @@ import AuthService from "./utils/authService";
 // Cache implementation
 const cache = new InMemoryCache()
 
-let token; 
-(async() => token = await AuthService.getToken())()
 
-const authMiddleware = new ApolloLink((operation, forward) => {
+let token;
+(async () => token = await AuthService.getToken())()
+
+const authMiddleware = new ApolloLink((operation, next) => {
   // add the authorization to the headers
   operation.setContext(({ headers = {} }) => ({
     headers: {
@@ -45,7 +46,7 @@ const authMiddleware = new ApolloLink((operation, forward) => {
       authorization: `Bearer ${localStorage.getItem("id_token") || null}`,
     }
   }));
-  return forward(operation);
+  return next(operation);
 })
 
 // HTTP connection to the API
@@ -63,16 +64,13 @@ const apolloClient = new ApolloClient({
   link: concat(authMiddleware, httpLink),
   cache,
 });
-const app = createApp({
-  setup() {
-    provide(DefaultApolloClient, apolloClient);
-    provide("$token", "laksjflaksjdflaskjdf");
-  },
-  render: () => h(App)
-})
-  .use(IonicVue)
-  .use(router)
-  .use(store);
+const app = createApp({ setup() { provide(DefaultApolloClient, apolloClient);
+                                  provide("$token", null);
+                                  provide("$email", null); }
+                      , render: () => h(App) })
+                                              .use(IonicVue)
+                                              .use(router)
+                                              .use(store);
 //creating a base layout wrapper component
 app.component('base-layout', BaseLayout);
   

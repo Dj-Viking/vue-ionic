@@ -84,26 +84,27 @@ export interface LogoutResponse {
 /**
  * expected me query response
  */
-export interface MeQueryResponse {
+export interface MeQueryResponse extends Object {
     errors: null
     | [{
         field: string;
         message: string;
     }];
-    username: string;
-    id: number;
-    email: string;
+    me: {
+        token: string;
+        username: string;
+        id: number;
+        email: string;
+    };
 }
 
-export interface UserState {
-    token?: string | null;
+export interface UserState extends Object {
+    token?: string | null | undefined;
     email: string | null;
     username: string | null;
 }
 
-export type SetUserPayload = UserState;
-
-export interface SetUserMutationFn<S, T extends SetUserPayload> {
+export interface SetUserMutationFn<S, T extends MeQueryResponse> {
     (state: S, payload: T): void;
 }
 export interface SetUserTokenMutationFn<S, T> {
@@ -130,12 +131,12 @@ export interface MyStore {
         memories: Memory[];
     };
     mutations?: {
-        "SET_USER": () => SetUserMutationFn<MyStore["state"], SetUserPayload>;
+        "SET_USER": () => SetUserMutationFn<MyStore["state"], MeQueryResponse>;
         "SET_USER_TOKEN": () => SetUserTokenMutationFn<MyStore["state"], string>;
         "CLEAR_USER_TOKEN": () => ClearUserTokenMutationFn<MyStore["state"], "">;
     };
     actions?: {
-        setUser: () => SetUserActionFn<ActionContext<MyStore["state"], MyStore["state"]>, SetUserPayload>;
+        setUser: () => SetUserActionFn<ActionContext<MyStore["state"], MyStore["state"]>, MeQueryResponse>;
         setUserToken: () => SetUserTokenActionFn<ActionContext<MyStore["state"], MyStore["state"]>, string>;
         clearUserToken: () => ClearUserTokenActionFn<ActionContext<MyStore["state"], MyStore["state"]>, "">;
         getOneMemory: () => GetOneMemoryActionFn<ActionContext<MyStore["state"], MyStore["state"]>, number>;
