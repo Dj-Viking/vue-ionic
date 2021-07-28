@@ -1,4 +1,3 @@
-import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -35,7 +34,7 @@ export type Mutation = {
   changePassword: UserResponse;
   register: UserResponse;
   login: UserResponse;
-  logout: Scalars['Boolean'];
+  logout: UserResponse;
 };
 
 
@@ -59,6 +58,11 @@ export type MutationLoginArgs = {
   options: LoginInput;
 };
 
+
+export type MutationLogoutArgs = {
+  email: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
@@ -77,6 +81,8 @@ export type User = {
   email: Scalars['String'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
+  token?: Maybe<Scalars['String']>;
+  permissions?: Maybe<Scalars['String']>;
 };
 
 export type UserFieldError = {
@@ -89,6 +95,7 @@ export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<UserFieldError>>;
   user?: Maybe<User>;
+  token?: Maybe<Scalars['String']>;
 };
 
 export type LoginMutationVariables = Exact<{
@@ -125,28 +132,3 @@ export type MeQuery = (
     & UserInfoFragment
   )> }
 );
-export const UserInfoFragmentDoc = gql`
-    fragment userInfo on User {
-  id
-  username
-  email
-  createdAt
-  updatedAt
-}
-    `;
-export const LoginDocument = gql`
-    mutation login($options: LoginInput!) {
-  login(options: $options) {
-    errors {
-      field
-      message
-    }
-    user {
-      ...userInfo
-    }
-  }
-}
-    ${UserInfoFragmentDoc}`;
-
-
-    
