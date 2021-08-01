@@ -38,15 +38,17 @@
           Password
         </ion-label>
         <ion-input v-model="password" type="password"></ion-input>
-        <ion-button @click="() => {
-          submitRegister({
-            options: {
-              email,
-              username,
-              password
-            }
-          })
-        }">
+        <ion-button j
+          @click="() => {
+            submitRegister({
+              options: {
+                email,
+                username,
+                password
+              }
+            });
+          }"
+        >
           <span v-if="!registerIsLoading && !showSpinner">
             SIGN UP 
           </span>

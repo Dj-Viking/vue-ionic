@@ -8,10 +8,10 @@
               :class="!isHome ? 'custom-button' : isHome && !isLoggedIn ? 'custom-button' : 'hide'"
               @click="() => {
                 if (!isHome) {
-                  return router.back()
+                  return router.push({ name: 'home' });
                 }
                 if (isHome && !isLoggedIn) {
-                  return router.push({name: 'login'})
+                  return router.push({ name: 'login' });
                 }
               }"
             >
@@ -22,7 +22,10 @@
               :class="((!isHome || isHome) && isLoggedIn) && 'custom-button' || ((!isHome || isHome) && !isLoggedIn) && 'custom-button'"
               @click="() => {
                 if (isHome && !isLoggedIn){
-                  return router.push({ name: 'signup' })
+                  return router.push({ name: 'signup' });
+                }
+                if (!isHome && !isLoggedIn) {
+                  return router.push({ name: 'signup' });
                 }
                 if (isHome && isLoggedIn) {
                   logout();
