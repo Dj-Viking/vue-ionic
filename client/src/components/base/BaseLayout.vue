@@ -3,45 +3,44 @@
       <ion-header>
         <ion-toolbar>
 
-          <ion-buttons slot="start">
-            <ion-back-button
-              :defaultHref="pageDefaultBackLink"
-            ></ion-back-button>
-          </ion-buttons>
-
           <ion-buttons slot="end">
-            <ion-button
+            <button
+              :class="!isHome ? 'custom-button' : isHome && !isLoggedIn ? 'custom-button' : 'hide'"
               @click="() => {
                 if (!isHome) {
-                  return router.back()
+                  return router.push({ name: 'home' });
                 }
                 if (isHome && !isLoggedIn) {
-                  return router.push({name: 'login'})
+                  return router.push({ name: 'login' });
                 }
               }"
             >
               {{ !isHome ? "Home" : isHome && !isLoggedIn ? "Login" : null }}
-            </ion-button>
+            </button>
 
-            <ion-button
+            <button
+              :class="((!isHome || isHome) && isLoggedIn) && 'custom-button' || ((!isHome || isHome) && !isLoggedIn) && 'custom-button'"
               @click="() => {
                 if (isHome && !isLoggedIn){
-                  return router.push({name: 'signup'})
+                  return router.push({ name: 'signup' });
+                }
+                if (!isHome && !isLoggedIn) {
+                  return router.push({ name: 'signup' });
                 }
                 if (isHome && isLoggedIn) {
                   logout();
                   refetch();
-                  return router.push({name: 'home'});
+                  return router.push({ name: 'home' });
                 }
                 if (!isHome && isLoggedIn) {
                   logout();
                   refetch();
-                  return router.push({name: 'home'});
+                  return router.push({ name: 'home' });
                 }
               }"
             >
               {{ (isHome || !isHome) && isLoggedIn ? "Logout" : (!isHome || isHome) && !isLoggedIn ? "Signup" : null }}
-            </ion-button>
+            </button>
 
           </ion-buttons>
 
@@ -72,9 +71,7 @@ import {
   IonTitle, 
   IonContent, 
   IonToolbar,
-  IonBackButton,
   IonButtons,
-  IonButton
 } from "@ionic/vue";
 import { LogoutResponse, MeQueryResponse } from "../../types";
 import { EmitsOptions, SetupContext } from "vue";
@@ -92,14 +89,12 @@ export default defineComponent({
     IonTitle, 
     IonContent,
     IonToolbar,
-    IonBackButton,
     IonButtons,
-    IonButton
   },
   // eslint-disable-next-line
   setup(this: void, _props, _ctx: SetupContext<EmitsOptions>) {
 
-    const globalEmail = inject("$email");
+    let globalEmail = inject("$email");
     const isLoggedIn = ref(false);
     const logoutRes = ref({});
     const { result: meResult, refetch } = useQuery(gql`${createMeQuery()}`);
@@ -111,6 +106,7 @@ export default defineComponent({
 
     onLogoutDone(result => {
       isLoggedIn.value = false;
+      globalEmail = "";
       logoutRes.value = result.data
     });
 
@@ -134,18 +130,23 @@ export default defineComponent({
       if (newValue.me === null) {
         this.setMe({});
         this.isLoggedIn = false;
+        console.log("is logged in ", this.isLoggedIn);
+        
       } else {
         this.setMe(newValue);
         localStorage.setItem("global_email", newValue.me.email);
         await Auth.setToken(newValue.me.token);
-        this.isLoggedIn = true;
-      }
-      const token = await Auth.getToken();
-      const isExpired = await Auth.isTokenExpired(token);
-      if (isExpired === false) this.isLoggedIn = true;
-      else this.isLoggedIn = false;
 
-      console.log("is token expired", isExpired)
+        //get the token from me query
+        const token = newValue.me.token;
+        //check if it is expired
+        const isExpired = await Auth.isTokenExpired(token);
+        if (isExpired) this.isLoggedIn = false;
+        else this.isLoggedIn = true;
+
+        console.log("is token expired during me query", isExpired);
+        
+      }
     },
     logoutRes: async function(newValue: LogoutResponse) {
       console.log("what is the logout response new value", newValue);
@@ -179,5 +180,4 @@ export default defineComponent({
 </script>
 
 <style>
-
 </style>

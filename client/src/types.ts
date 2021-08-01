@@ -31,7 +31,6 @@ export interface RegisterArgs {
  */
 export interface RegisterResponse {
     register: {
-        token: string;
         errors: null
         | [{
             field: string;
@@ -40,6 +39,8 @@ export interface RegisterResponse {
         user: null
         | {
             email: string;
+            username: string;
+            token: string;
         };
     };
 }
@@ -93,7 +94,6 @@ export interface MeQueryResponse extends Object {
     me: {
         token: string;
         username: string;
-        id: number;
         email: string;
     };
 }

@@ -171,7 +171,7 @@ export default defineComponent({
           this.showSpinner = false;
           this.submitted = false;
           router.back();
-        }, 4000);
+        }, 2000);
       } else return console.error("there was no truthy value returned for the user object or errors"); 
     }
   },

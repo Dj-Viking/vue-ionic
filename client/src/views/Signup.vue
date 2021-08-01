@@ -38,15 +38,17 @@
           Password
         </ion-label>
         <ion-input v-model="password" type="password"></ion-input>
-        <ion-button @click="() => {
-          submitRegister({
-            options: {
-              email,
-              username,
-              password
-            }
-          })
-        }">
+        <ion-button j
+          @click="() => {
+            submitRegister({
+              options: {
+                email,
+                username,
+                password
+              }
+            });
+          }"
+        >
           <span v-if="!registerIsLoading && !showSpinner">
             SIGN UP 
           </span>
@@ -76,7 +78,7 @@ import {
   IonInput, 
   IonButton
 } from '@ionic/vue';
-import { defineComponent, ref, onMounted, SetupContext, EmitsOptions } from "vue";
+import { defineComponent, ref, onMounted, SetupContext, EmitsOptions, inject } from "vue";
 import BaseLayout from "../components/base/BaseLayout.vue";
 import router from "../router";
 import Spinner from "../components/spinner.vue";
@@ -87,7 +89,9 @@ import {
   // RegisterArgs, 
   RegisterResponse 
 } from "../types";
+import Auth from "../utils/authService";
 import { mapActions, mapGetters } from 'vuex';
+import { FetchResult } from '@apollo/client/core';
 /**
  * for more help with vue3 composition api and vue apollo check out 
  * @see https://v4.apollo.vuejs.org/guide-composable/mutation.html#ondone
@@ -102,6 +106,7 @@ export default defineComponent({
   },
   // eslint-disable-next-line
   setup(this: void, _props, _ctx: SetupContext<EmitsOptions>){
+    let globalEmail = inject("$email");
     const email = ref("");
     const username = ref("");
     const password = ref("");
@@ -122,9 +127,10 @@ export default defineComponent({
         }
       }
     });
-    onRegisterDone(result => {
+    onRegisterDone((result: FetchResult<RegisterResponse, Record<string, any>, Record<string, any>>) => {
       res.value = result.data;
       submitted.value = false;
+      globalEmail = result.data.register.user.email;
     });
     function initFields(): void {
       submitted.value = false;
@@ -134,7 +140,7 @@ export default defineComponent({
     }
     onMounted(initFields);
 
-    return { submitRegister, email, username, password, registerIsLoading, registerError, res, submitted };
+    return { submitRegister, email, username, password, registerIsLoading, globalEmail, registerError, res, submitted };
   },
   data() { 
     return {
@@ -160,7 +166,7 @@ export default defineComponent({
         this.submitted = false;
       }, 3000);
     },
-    ...mapActions(["setUserToken"])
+    ...mapActions(["setUserToken", "setMe"])
   },
   watch: {
     res: async function(newValue: RegisterResponse) {
@@ -173,8 +179,11 @@ export default defineComponent({
         this.resetError();
         console.log('error while getting signup res', newValue.register.errors[0]);
       } else {
-        //set the token for local state memory on the user to be the auth'd state of the app? 
-        await this.setUserToken(newValue.register.token);
+        //set the user state and set the token and the global email
+        console.log("the user returned after registering", newValue.register)
+        this.setMe(newValue.register.user);
+        await Auth.setToken(newValue.register.user.token);
+
         console.log('did user get the token stored locally after successful signup???', this.user);
         
         this.successMsg = "Success!! teleporting to home page";

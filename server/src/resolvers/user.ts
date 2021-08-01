@@ -294,6 +294,8 @@ export class UserResolver {
       // i guess I could insert as many objects into the table and will
       // return more created objects into the raw array
       user = result.raw[0];
+      console.log('what is the result', result.raw[0]);
+      
       
       return {
         token,
