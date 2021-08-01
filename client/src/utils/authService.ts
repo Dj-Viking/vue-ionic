@@ -22,7 +22,8 @@ class AuthService {
     console.log("token we're trying to check", token);
     
     try {
-      if ((await this.getToken()) === null) return;
+      const token = await this.getToken();
+      if (!token) return;
       const decoded: JwtPayload = decode(token);
       if (decoded.exp < Date.now() / 1000) 
         return true;
@@ -43,11 +44,11 @@ class AuthService {
     })
   }
 
-  public async setToken(token: string): Promise<void> {
+  public async setToken(token: string): Promise<void | string> {
     // Saves user token to localStorage
     return new Promise((resolve) => {
       localStorage.setItem('id_token', token);
-      resolve();
+      resolve(token);
     });
   }
 
@@ -66,7 +67,6 @@ class AuthService {
       const token = this.getToken();
       if (token) {
         localStorage.removeItem('id_token');
-        localStorage.removeItem('global_email');
       } else return;
   }
 }

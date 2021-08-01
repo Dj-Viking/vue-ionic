@@ -8,6 +8,8 @@ export function createRegisterMutation(): string {
         }
         user{
           email
+          token
+          username
         }
       }
     }
