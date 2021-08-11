@@ -14,8 +14,9 @@ import { getConnection } from 'typeorm';
 import argon2 from 'argon2';
 import { FORGET_PASS_PREFIX } from '../constants';
 import { sendEmail } from '../utils/sendEmail';
-import { ErrorResponse } from '../utils/createError';
+import { ErrorResponse } from '../utils/ErrorResponse';
 import { signToken } from '../utils/signToken';
+import { verifyRegisterArgs } from '../utils/verifyRegisterArgs';
 const uuid = require('uuid');
 
 @InputType()
@@ -246,30 +247,10 @@ export class UserResolver {
   async register(
     @Arg('options', () => RegisterInput) options: RegisterInput,
   ): Promise<UserResponse> {
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     try 
     {
-      if (emailRegex.test(options.email) === false) 
-      {
-        const field = "Email";
-        const message = "Email is not in correct format. Must be like example@mail.com";
-        return new ErrorResponse(field, message);
-      }
-      if (options.username.length <= 2) 
-      {
-        const field =  "Username";
-        const message = "username length too short must be greater than 2 characters";
-        return new ErrorResponse(field, message);
-      }
-      if (options.password.length <= 3) 
-      {
-        const field = "Password";
-        const message = "password length too short must be greater than 3 characters";
-        return new ErrorResponse(field, message);
-      }
-
-      
+      const verifyRes = verifyRegisterArgs(options);
+      if (verifyRes instanceof ErrorResponse) return verifyRes;
       const hashedPassword = await argon2.hash(options.password);
 
       let tempUser = {

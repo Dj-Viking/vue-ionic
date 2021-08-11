@@ -96,6 +96,7 @@ export default defineComponent({
     const password = ref("");
     const loginRes = ref({});
     const submitted = ref(false);
+
     const { 
       mutate: submitLogin, 
       loading: loginIsLoading, 
@@ -111,17 +112,21 @@ export default defineComponent({
         }
       }
     );
+
     onLoginDone((result) => {
       //set global token from login result
       loginRes.value = result.data;
       submitted.value = false;
     });
+
     function initFields(): void {
       submitted.value = false;
       email.value = "";
       password.value = "";
     }
+
     onMounted(initFields);
+    
     return { submitLogin, email, password, loginIsLoading, loginError, loginRes, submitted, globalEmail };
   },
   data() { 

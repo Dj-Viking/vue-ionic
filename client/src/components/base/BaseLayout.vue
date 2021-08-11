@@ -3,7 +3,7 @@
       <ion-header>
         <ion-toolbar>
 
-          <ion-buttons slot="end">
+          <ion-buttons>
             <button
               :class="!isHome ? 'custom-button' : isHome && !isLoggedIn ? 'custom-button' : 'hide'"
               @click="() => {
@@ -97,18 +97,13 @@ export default defineComponent({
     let globalEmail = inject("$email");
     const isLoggedIn = ref(false);
     const logoutRes = ref({});
+
     const { result: meResult, refetch } = useQuery(gql`${createMeQuery()}`);
-
-    const { 
-      mutate: logout,
-      onDone: onLogoutDone  
-    } = useMutation(gql`${createLogoutMutation()}`, { variables: { email: globalEmail }});
-
-    onLogoutDone(result => {
-      isLoggedIn.value = false;
-      globalEmail = "";
-      logoutRes.value = result.data
-    });
+    const { mutate: logout, onDone: onLogoutDone } = useMutation( gql`${createLogoutMutation()}`
+                                                                , { variables: { email: globalEmail }});
+    onLogoutDone(result => { isLoggedIn.value = false;
+                             globalEmail = "";
+                             logoutRes.value = result.data; });
 
     return { meResult, logout, logoutRes, refetch, globalEmail, isLoggedIn };
   },
